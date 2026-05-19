@@ -14,13 +14,41 @@ on:
 permissions:
   contents: write
 
-env:
-  SDK_VERSION: ${{ inputs.version || '1.0.0' }}
-
 jobs:
+  release-metadata:
+    name: Release metadata
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag_name: ${{ steps.version.outputs.tag_name }}
+    steps:
+      - id: version
+        name: Resolve release version
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+            tag_name="${GITHUB_REF_NAME}"
+          else
+            version="${{ inputs.version }}"
+            tag_name="v${version}"
+          fi
+
+          if [[ -z "${version}" ]]; then
+            echo "Release version is empty." >&2
+            exit 1
+          fi
+
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "tag_name=${tag_name}" >> "$GITHUB_OUTPUT"
+
   cpp-package:
     name: C++ release package
     runs-on: ubuntu-latest
+    needs: release-metadata
+    env:
+      SDK_VERSION: ${{ needs.release-metadata.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       - name: Package C++ SDK
@@ -44,6 +72,9 @@ jobs:
   java-desktop:
     name: Java desktop JAR
     runs-on: ubuntu-latest
+    needs: release-metadata
+    env:
+      SDK_VERSION: ${{ needs.release-metadata.outputs.version }}
     defaults:
       run:
         working-directory: xl-dl-java
@@ -58,14 +89,23 @@ jobs:
         shell: bash
       - run: ./gradlew :desktop:jar
         shell: bash
+      - name: Rename desktop JAR
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ../release-dist
+          cp desktop/build/libs/xl-dl-desktop-*.jar "../release-dist/xl-dl-desktop-${SDK_VERSION}.jar"
       - uses: actions/upload-artifact@v4
         with:
           name: java-desktop-jar
-          path: xl-dl-java/desktop/build/libs/xl-dl-desktop-${{ env.SDK_VERSION }}.jar
+          path: release-dist/xl-dl-desktop-${{ env.SDK_VERSION }}.jar
 
   java-native:
     name: Java native JAR (${{ matrix.native_id }})
     runs-on: ${{ matrix.os }}
+    needs: release-metadata
+    env:
+      SDK_VERSION: ${{ needs.release-metadata.outputs.version }}
     strategy:
       fail-fast: false
       matrix:
@@ -103,17 +143,26 @@ jobs:
         shell: bash
       - run: ./gradlew :native:${{ matrix.native_id }}:jar
         shell: bash
+      - name: Rename native JAR
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ../release-dist
+          cp native/${{ matrix.native_id }}/build/libs/xl-dl-native-${{ matrix.native_id }}-*.jar "../release-dist/xl-dl-native-${{ matrix.native_id }}-${SDK_VERSION}.jar"
       - uses: actions/upload-artifact@v4
         with:
           name: java-native-${{ matrix.native_id }}
-          path: xl-dl-java/native/${{ matrix.native_id }}/build/libs/xl-dl-native-${{ matrix.native_id }}-${{ env.SDK_VERSION }}.jar
+          path: release-dist/xl-dl-native-${{ matrix.native_id }}-${{ env.SDK_VERSION }}.jar
 
   java-desktop-package:
     name: Java desktop release package
     runs-on: ubuntu-latest
     needs:
+      - release-metadata
       - java-desktop
       - java-native
+    env:
+      SDK_VERSION: ${{ needs.release-metadata.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -144,6 +193,9 @@ jobs:
   java-android:
     name: Java Android AAR
     runs-on: ubuntu-latest
+    needs: release-metadata
+    env:
+      SDK_VERSION: ${{ needs.release-metadata.outputs.version }}
     defaults:
       run:
         working-directory: xl-dl-java
@@ -171,6 +223,9 @@ jobs:
   swift-package:
     name: Swift release package
     runs-on: ubuntu-latest
+    needs: release-metadata
+    env:
+      SDK_VERSION: ${{ needs.release-metadata.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       - name: Package Swift SDK
@@ -190,14 +245,127 @@ jobs:
           name: swift-release-package
           path: dist/xunlei-dlsdk-swift-${{ env.SDK_VERSION }}.zip
 
+  publish-nuget:
+    name: Publish NuGet packages
+    runs-on: ubuntu-latest
+    needs: release-metadata
+    env:
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+    defaults:
+      run:
+        working-directory: xl-dl-csharp/dotnet
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Pack NuGet packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/nuget
+          common_args=(-c Release -o artifacts/nuget -p:ContinuousIntegrationBuild=true)
+          dotnet pack src/Xunlei.XlDl/Xunlei.XlDl.csproj "${common_args[@]}"
+          dotnet pack native/linux-x64/Xunlei.XlDl.Native.linux-x64.csproj "${common_args[@]}"
+          dotnet pack native/osx-universal/Xunlei.XlDl.Native.osx-universal.csproj "${common_args[@]}"
+          dotnet pack native/win-x64/Xunlei.XlDl.Native.win-x64.csproj "${common_args[@]}"
+          dotnet pack native/win-x86/Xunlei.XlDl.Native.win-x86.csproj "${common_args[@]}"
+      - name: Publish to nuget.org
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${NUGET_API_KEY}" ]]; then
+            echo "NUGET_API_KEY secret is required." >&2
+            exit 1
+          fi
+
+          for package in artifacts/nuget/*.nupkg; do
+            dotnet nuget push "$package" \
+              --api-key "${NUGET_API_KEY}" \
+              --source "https://api.nuget.org/v3/index.json" \
+              --skip-duplicate
+          done
+
+  publish-npm:
+    name: Publish npm packages
+    runs-on: ubuntu-latest
+    needs: release-metadata
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    defaults:
+      run:
+        working-directory: xl-dl-node
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          scope: "@xunlei-open"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm --filter @xunlei-open/dlsdk typecheck
+      - run: pnpm --filter @xunlei-open/dlsdk build
+      - name: Publish to npm
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${NODE_AUTH_TOKEN}" ]]; then
+            echo "NPM_TOKEN secret is required." >&2
+            exit 1
+          fi
+
+          npm publish ./packages/native-windows-x64 --access public
+          npm publish ./packages/native-windows-x86 --access public
+          npm publish ./packages/native-macos-universal --access public
+          npm publish ./packages/native-linux-x64 --access public
+          npm publish ./packages/core --access public
+
+  publish-pypi:
+    name: Publish PyPI packages
+    runs-on: ubuntu-latest
+    needs: release-metadata
+    defaults:
+      run:
+        working-directory: xl-dl-python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip build
+      - name: Build Python distributions
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .release-dist
+          mkdir -p .release-dist
+          python -m build --outdir .release-dist .
+          python -m build --outdir .release-dist native/xl_dl_python_native_windows_x64
+          python -m build --outdir .release-dist native/xl_dl_python_native_windows_x86
+          python -m build --outdir .release-dist native/xl_dl_python_native_macos_universal
+          python -m build --outdir .release-dist native/xl_dl_python_native_linux_x64
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: xl-dl-python/.release-dist
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true
+
   publish-release:
     name: Publish GitHub Release
     runs-on: ubuntu-latest
     needs:
+      - release-metadata
       - cpp-package
       - java-desktop-package
       - java-android
       - swift-package
+      - publish-nuget
+      - publish-npm
+      - publish-pypi
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -219,5 +387,5 @@ jobs:
         run: ls -la dist
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('v{0}', env.SDK_VERSION) }}
+          tag_name: ${{ needs.release-metadata.outputs.tag_name }}
           files: dist/*
