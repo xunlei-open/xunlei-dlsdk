@@ -317,11 +317,26 @@ jobs:
             exit 1
           fi
 
-          npm publish ./packages/native-windows-x64 --access public
-          npm publish ./packages/native-windows-x86 --access public
-          npm publish ./packages/native-macos-universal --access public
-          npm publish ./packages/native-linux-x64 --access public
-          npm publish ./packages/core --access public
+          publish_if_missing() {
+            local package_dir="$1"
+            local package_name
+            local package_version
+            package_name="$(node -p "require('./${package_dir}/package.json').name")"
+            package_version="$(node -p "require('./${package_dir}/package.json').version")"
+
+            if npm view "${package_name}@${package_version}" version --registry "https://registry.npmjs.org" >/dev/null 2>&1; then
+              echo "npm package ${package_name} ${package_version} already exists; skipping."
+              return 0
+            fi
+
+            npm publish "./${package_dir}" --access public
+          }
+
+          publish_if_missing packages/native-windows-x64
+          publish_if_missing packages/native-windows-x86
+          publish_if_missing packages/native-macos-universal
+          publish_if_missing packages/native-linux-x64
+          publish_if_missing packages/core
 
   publish-pypi:
     name: Publish PyPI packages
@@ -389,3 +404,4 @@ jobs:
         with:
           tag_name: ${{ needs.release-metadata.outputs.tag_name }}
           files: dist/*
+          overwrite_files: true
