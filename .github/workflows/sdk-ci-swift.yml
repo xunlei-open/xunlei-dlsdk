@@ -1,0 +1,40 @@
+name: SDK CI - Swift
+
+on:
+  push:
+    paths:
+      - ".github/workflows/sdk-ci-swift.yml"
+      - "xl-dl-swift/**"
+  pull_request:
+    paths:
+      - ".github/workflows/sdk-ci-swift.yml"
+      - "xl-dl-swift/**"
+  workflow_dispatch:
+
+env:
+  XL_DL_TEST_TIMEOUT_SECONDS: "900"
+  XL_DL_TEST_URL: ${{ vars.XL_DL_TEST_URL }}
+
+jobs:
+  swift:
+    name: Swift
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: xl-dl-swift
+    env:
+      APP_ID: ${{ secrets.APP_ID }}
+      API_KEY: ${{ secrets.API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift build
+      - name: Run SDK integration test
+        if: ${{ env.APP_ID != '' && env.API_KEY != '' }}
+        env:
+          DYLD_LIBRARY_PATH: ${{ github.workspace }}/xl-dl-swift/Binaries/macos
+        run: swift run xl-dl-swift-integration-test
+      - name: Verify iOS binary
+        run: |
+          test -f Binaries/ios/dk.framework/dk
+          test -f Binaries/ios/dk.framework/Headers/xl_dl_sdk.h
+          test -f Binaries/ios/dk.framework/Info.plist

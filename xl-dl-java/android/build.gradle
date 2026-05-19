@@ -1,0 +1,40 @@
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+}
+
+android {
+    namespace 'com.xunlei.open.dlsdk'
+    compileSdk 35
+
+    defaultConfig {
+        minSdk 23
+        aarMetadata {
+            minCompileSdk = 23
+        }
+    }
+
+    sourceSets {
+        main {
+            // Package the shared API source directly into xl-dl-android.
+            // Do not copy XLDownloadAPI into android/src; common is the single source of truth.
+            java.srcDirs = ['../common/src/main/java', 'src/main/java']
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+
+    publishing {
+        singleVariant('release')
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                artifactId = 'xl-dl-android'
+            }
+        }
+    }
+}

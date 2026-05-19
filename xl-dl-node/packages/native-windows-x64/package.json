@@ -1,0 +1,13 @@
+{
+  "name": "@xunlei-open/dlsdk-native-windows-x64",
+  "version": "1.0.0",
+  "description": "XL Download Node SDK 的 Windows x64 平台动态库包。",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "lib",
+    "README.md"
+  ],
+  "os": ["win32"],
+  "cpu": ["x64"]
+}

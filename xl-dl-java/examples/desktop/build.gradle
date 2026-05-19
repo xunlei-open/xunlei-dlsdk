@@ -1,0 +1,45 @@
+plugins {
+    id 'application'
+}
+
+group = 'com.xunlei.open.examples'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.withType(JavaCompile) {
+    options.release = 8
+    options.encoding = 'UTF-8'
+}
+
+application {
+    mainClass = 'com.xunlei.open.dlsdk_demo.XLDownloadDemo'
+}
+
+dependencies {
+  implementation 'org.json:json:20231013'
+  implementation 'com.xunlei.open:xl-dl-desktop:1.0.0'
+  runtimeOnly "com.xunlei.open:xl-dl-native-${currentNativeArtifactSuffix()}:1.0.0"
+}
+
+String currentNativeArtifactSuffix() {
+    String os = System.getProperty('os.name').toLowerCase(Locale.ROOT)
+    String arch = System.getProperty('os.arch').toLowerCase(Locale.ROOT)
+
+    if (os.contains('win')) {
+        if (arch == 'amd64' || arch == 'x86_64') {
+            return 'windows-x64'
+        }
+    } else if (os.contains('mac')) {
+        return 'macos-universal'
+    } else if (os.contains('linux')) {
+        if (arch == 'amd64' || arch == 'x86_64') {
+            return 'linux-x64'
+        }
+    }
+
+    throw new GradleException("Unsupported desktop example platform: ${os} ${arch}")
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@xunlei-open/dlsdk-native-macos-universal",
+  "version": "1.0.0",
+  "description": "XL Download Node SDK 的 macOS universal 平台动态库包。",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "lib",
+    "README.md"
+  ],
+  "os": ["darwin"],
+  "cpu": ["x64", "arm64"]
+}

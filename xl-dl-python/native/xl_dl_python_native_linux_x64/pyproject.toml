@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xunlei-open-dlsdk-native-linux-x64"
+version = "1.0.0"
+description = "XL Download Python SDK 的 Linux x64 平台动态库包"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [{ name = "Xunlei" }]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+xl_dl_python_native_linux_x64 = ["libdk.so"]

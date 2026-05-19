@@ -1,0 +1,38 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+sourceSets {
+    main {
+        // Package the shared API source directly into xl-dl-desktop.
+        // Do not copy XLDownloadAPI into desktop/src; common is the single source of truth.
+        java.srcDirs = ['../common/src/main/java', 'src/main/java']
+    }
+    test {
+        java.srcDirs = ['src/test/java']
+    }
+}
+
+tasks.register('integrationTest', JavaExec) {
+    group = 'verification'
+    description = 'Runs the desktop SDK integration flow against the native runtime.'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.xunlei.open.dlsdk.XLDownloadAPIIntegrationTest'
+    systemProperty 'com.xunlei.open.dlsdk.native.dir',
+            System.getProperty('com.xunlei.open.dlsdk.native.dir', '')
+}
+
+jar {
+    archiveBaseName = 'xl-dl-desktop'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = 'xl-dl-desktop'
+        }
+    }
+}

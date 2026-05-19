@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Xunlei.XlDl.Unity</AssemblyName>
+    <RootNamespace>Xunlei.XlDl.Unity</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <DefineConstants>UNITY_2020_2_OR_NEWER;UNITY_EDITOR_WIN</DefineConstants>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="UnityEngineStubs.cs" />
+    <Compile Include="../Runtime/XLDownloadAPI.cs" Link="XLDownloadAPI.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,100 @@
+name: SDK CI - C++
+
+on:
+  push:
+    paths:
+      - ".github/workflows/sdk-ci-cpp.yml"
+      - "xl-dl-cpp/**"
+  pull_request:
+    paths:
+      - ".github/workflows/sdk-ci-cpp.yml"
+      - "xl-dl-cpp/**"
+  workflow_dispatch:
+
+env:
+  XL_DL_TEST_TIMEOUT_SECONDS: "900"
+  XL_DL_TEST_URL: ${{ vars.XL_DL_TEST_URL }}
+
+jobs:
+  cpp:
+    name: C++ (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: xl-dl-cpp
+    env:
+      APP_ID: ${{ secrets.APP_ID }}
+      API_KEY: ${{ secrets.API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev ninja-build
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: vcpkg install curl:x64-windows
+      - name: Configure SDK
+        shell: bash
+        run: |
+          TOOLCHAIN=""
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            TOOLCHAIN="-DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+          fi
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$PWD/install" $TOOLCHAIN
+      - name: Build and install SDK
+        shell: bash
+        run: cmake --build build && cmake --install build
+      - name: Build SDK integration test
+        shell: bash
+        run: |
+          TOOLCHAIN=""
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            TOOLCHAIN="-DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+          fi
+          cmake -S tests/integration -B build-integration -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$PWD/install" $TOOLCHAIN
+          cmake --build build-integration
+      - name: Run SDK integration test (Linux)
+        if: ${{ runner.os == 'Linux' && env.APP_ID != '' && env.API_KEY != '' }}
+        shell: bash
+        env:
+          LD_LIBRARY_PATH: ${{ github.workspace }}/xl-dl-cpp/install/lib
+        run: ./build-integration/xl_dl_cpp_integration_test
+      - name: Run SDK integration test (macOS)
+        if: ${{ runner.os == 'macOS' && env.APP_ID != '' && env.API_KEY != '' }}
+        shell: bash
+        env:
+          DYLD_LIBRARY_PATH: ${{ github.workspace }}/xl-dl-cpp/install/lib
+        run: ./build-integration/xl_dl_cpp_integration_test
+      - name: Run SDK integration test (Windows)
+        if: ${{ runner.os == 'Windows' && env.APP_ID != '' && env.API_KEY != '' }}
+        shell: bash
+        run: |
+          export PATH="$PWD/install/bin:$PATH"
+          ./build-integration/xl_dl_cpp_integration_test.exe
+      - name: Build example
+        shell: bash
+        run: |
+          TOOLCHAIN=""
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            TOOLCHAIN="-DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+          fi
+          cmake -S examples -B build-example -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$PWD/install" $TOOLCHAIN
+          cmake --build build-example
+      - name: Verify Windows x86 native package
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          cmake -S . -B build-win-x86-native -G Ninja -DXL_DL_CPP_NATIVE_PLATFORM=windows-x86 -DCMAKE_INSTALL_PREFIX="$PWD/install-win-x86-native" -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+          cmake --install build-win-x86-native
+          test -f "$PWD/install-win-x86-native/bin/dk.dll"
+          test -f "$PWD/install-win-x86-native/lib/dk.lib"

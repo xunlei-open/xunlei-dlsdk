@@ -1,0 +1,14 @@
+{
+  "name": "Xunlei.XlDl.Unity",
+  "rootNamespace": "Xunlei.XlDl.Unity",
+  "references": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

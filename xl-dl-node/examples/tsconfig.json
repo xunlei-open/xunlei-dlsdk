@@ -1,0 +1,11 @@
+{
+  "extends": "../packages/core/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "typeRoots": ["../packages/core/node_modules/@types"],
+    "paths": {
+      "@xunlei-open/dlsdk": ["packages/core/dist/index.d.ts"]
+    }
+  },
+  "include": ["basic-download.ts"]
+}

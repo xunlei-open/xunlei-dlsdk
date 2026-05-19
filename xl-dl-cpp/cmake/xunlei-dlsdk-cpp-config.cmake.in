@@ -1,0 +1,50 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(CURL)
+
+include("${CMAKE_CURRENT_LIST_DIR}/xunlei-dlsdk-cpp-targets.cmake")
+
+if(NOT TARGET xunlei::dlsdk)
+    set(_xl_dl_prefix "${PACKAGE_PREFIX_DIR}")
+
+    if(WIN32)
+        set(_xl_dl_runtime "${_xl_dl_prefix}/@CMAKE_INSTALL_BINDIR@/dk.dll")
+        set(_xl_dl_import "${_xl_dl_prefix}/@CMAKE_INSTALL_LIBDIR@/dk.lib")
+        if(EXISTS "${_xl_dl_runtime}" AND EXISTS "${_xl_dl_import}")
+            add_library(xunlei::dlsdk SHARED IMPORTED)
+            set_target_properties(xunlei::dlsdk PROPERTIES
+                IMPORTED_LOCATION "${_xl_dl_runtime}"
+                IMPORTED_IMPLIB "${_xl_dl_import}"
+                INTERFACE_INCLUDE_DIRECTORIES "${_xl_dl_prefix}/@CMAKE_INSTALL_INCLUDEDIR@"
+                INTERFACE_LINK_LIBRARIES CURL::libcurl
+            )
+        endif()
+    elseif(APPLE)
+        set(_xl_dl_runtime "${_xl_dl_prefix}/@CMAKE_INSTALL_LIBDIR@/libdk.dylib")
+        if(EXISTS "${_xl_dl_runtime}")
+            add_library(xunlei::dlsdk SHARED IMPORTED)
+            set_target_properties(xunlei::dlsdk PROPERTIES
+                IMPORTED_LOCATION "${_xl_dl_runtime}"
+                INTERFACE_INCLUDE_DIRECTORIES "${_xl_dl_prefix}/@CMAKE_INSTALL_INCLUDEDIR@"
+                INTERFACE_LINK_LIBRARIES CURL::libcurl
+            )
+        endif()
+    elseif(UNIX)
+        set(_xl_dl_runtime "${_xl_dl_prefix}/@CMAKE_INSTALL_LIBDIR@/libdk.so")
+        if(EXISTS "${_xl_dl_runtime}")
+            add_library(xunlei::dlsdk SHARED IMPORTED)
+            set_target_properties(xunlei::dlsdk PROPERTIES
+                IMPORTED_LOCATION "${_xl_dl_runtime}"
+                INTERFACE_INCLUDE_DIRECTORIES "${_xl_dl_prefix}/@CMAKE_INSTALL_INCLUDEDIR@"
+                INTERFACE_LINK_LIBRARIES CURL::libcurl
+            )
+        endif()
+    endif()
+
+    unset(_xl_dl_runtime)
+    unset(_xl_dl_import)
+    unset(_xl_dl_prefix)
+endif()
+
+check_required_components(xunlei-dlsdk-cpp)

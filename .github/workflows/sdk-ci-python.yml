@@ -1,0 +1,57 @@
+name: SDK CI - Python
+
+on:
+  push:
+    paths:
+      - ".github/workflows/sdk-ci-python.yml"
+      - "xl-dl-python/**"
+  pull_request:
+    paths:
+      - ".github/workflows/sdk-ci-python.yml"
+      - "xl-dl-python/**"
+  workflow_dispatch:
+
+env:
+  XL_DL_TEST_TIMEOUT_SECONDS: "900"
+  XL_DL_TEST_URL: ${{ vars.XL_DL_TEST_URL }}
+
+jobs:
+  python:
+    name: Python (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            native_package: native/xl_dl_python_native_linux_x64
+          - os: macos-latest
+            native_package: native/xl_dl_python_native_macos_universal
+          - os: windows-latest
+            native_package: native/xl_dl_python_native_windows_x64
+    defaults:
+      run:
+        working-directory: xl-dl-python
+    env:
+      APP_ID: ${{ secrets.APP_ID }}
+      API_KEY: ${{ secrets.API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip build
+      - run: python -m build
+      - name: Build all native packages
+        shell: bash
+        run: |
+          python -m build native/xl_dl_python_native_windows_x64
+          python -m build native/xl_dl_python_native_windows_x86
+          python -m build native/xl_dl_python_native_macos_universal
+          python -m build native/xl_dl_python_native_linux_x64
+      - run: python -m pip install . ${{ matrix.native_package }}
+      - name: Run SDK integration test
+        if: ${{ env.APP_ID != '' && env.API_KEY != '' }}
+        run: python -m unittest discover -s tests
+      - name: Compile example
+        run: python -m py_compile examples/basic_download.py

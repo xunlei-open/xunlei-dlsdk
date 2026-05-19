@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 应用主题颜色 -->
+    <color name="primary">#2196F3</color>
+    <color name="primary_dark">#1976D2</color>
+    <color name="primary_light">#BBDEFB</color>
+    <color name="accent">#FF4081</color>
+
+    <!-- 文本颜色 -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- 任务状态背景颜色 -->
+    <color name="task_normal_bg">#FFFFFF</color>
+    <color name="task_success_bg">#E8F5E9</color>
+    <color name="task_failed_bg">#FFEBEE</color>
+    <color name="task_paused_bg">#F5F5F5</color>
+
+    <!-- 进度条颜色 -->
+    <color name="progress_normal">#2196F3</color>
+    <color name="progress_success">#4CAF50</color>
+    <color name="progress_failed">#F44336</color>
+    <color name="progress_paused">#9E9E9E</color>
+
+    <!-- 分割线颜色 -->
+    <color name="divider">#EEEEEE</color>
+
+    <!-- 卡片背景颜色 -->
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_shadow">#1F000000</color>
+
+    <!-- 统计数据背景颜色 -->
+    <color name="stats_downloading">#2196F3</color>
+    <color name="stats_completed">#4CAF50</color>
+    <color name="stats_total">#9C27B0</color>
+
+    <!-- 按钮颜色 -->
+    <color name="button_normal">#2196F3</color>
+    <color name="button_pressed">#1976D2</color>
+    <color name="button_disabled">#BDBDBD</color>
+
+    <!-- 波纹效果颜色 -->
+    <color name="ripple">#33000000</color>
+
+    <!-- 警告和错误颜色 -->
+    <color name="warning">#FFC107</color>
+    <color name="error">#F44336</color>
+</resources>

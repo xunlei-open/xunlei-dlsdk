@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "pnpm --filter @xunlei-open/dlsdk build",
+    "dev": "pnpm --filter @xunlei-open/dlsdk dev",
+    "typecheck": "pnpm --filter @xunlei-open/dlsdk typecheck",
+    "test:integration": "node packages/core/test/integration.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,54 @@
+name: SDK CI - Node.js
+
+on:
+  push:
+    paths:
+      - ".github/workflows/sdk-ci-node.yml"
+      - "xl-dl-node/**"
+  pull_request:
+    paths:
+      - ".github/workflows/sdk-ci-node.yml"
+      - "xl-dl-node/**"
+  workflow_dispatch:
+
+env:
+  XL_DL_TEST_TIMEOUT_SECONDS: "900"
+  XL_DL_TEST_URL: ${{ vars.XL_DL_TEST_URL }}
+
+jobs:
+  node:
+    name: Node.js (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: xl-dl-node
+    env:
+      APP_ID: ${{ secrets.APP_ID }}
+      API_KEY: ${{ secrets.API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm --filter @xunlei-open/dlsdk typecheck
+      - run: pnpm --filter @xunlei-open/dlsdk build
+      - name: Run SDK integration test
+        if: ${{ env.APP_ID != '' && env.API_KEY != '' }}
+        run: pnpm test:integration
+      - name: Typecheck example
+        run: pnpm --filter @xunlei-open/dlsdk exec tsc -p ../../examples/tsconfig.json --noEmit
+      - name: Pack native packages
+        shell: bash
+        run: |
+          npm pack --dry-run ./packages/native-windows-x64
+          npm pack --dry-run ./packages/native-windows-x86
+          npm pack --dry-run ./packages/native-macos-universal
+          npm pack --dry-run ./packages/native-linux-x64

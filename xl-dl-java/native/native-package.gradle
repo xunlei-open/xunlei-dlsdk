@@ -1,0 +1,133 @@
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+
+import java.util.Locale
+
+def platformId = project.name
+def artifactSuffix = platformId
+def resourcePath = "META-INF/xunlei/open/dlsdk/native/${platformId}"
+def generatedResourcesDir = layout.buildDirectory.dir("generated/resources/jni")
+def cmakeBuildDir = layout.buildDirectory.dir("cmake-jni")
+
+def isWindows = platformId.startsWith('windows-')
+def isMac = platformId == 'macos-universal'
+def isLinux = platformId.startsWith('linux-')
+def coreLibraryName = isWindows ? 'dk.dll' : (isMac ? 'libdk.dylib' : 'libdk.so')
+def jniLibraryName = isWindows ? 'jni_dk.dll' : (isMac ? 'libjni_dk.dylib' : 'libjni_dk.so')
+
+def canBuildJniBridge = {
+    def osName = System.getProperty('os.name').toLowerCase(Locale.ROOT)
+    def osArch = System.getProperty('os.arch').toLowerCase(Locale.ROOT).replace('-', '_')
+
+    if (platformId == 'macos-universal') {
+        return osName.contains('mac') || osName.contains('darwin')
+    }
+    if (platformId == 'linux-x64') {
+        return osName.contains('linux') && (osArch == 'x86_64' || osArch == 'amd64')
+    }
+    if (platformId == 'windows-x64') {
+        return osName.contains('win')
+    }
+    if (platformId == 'windows-x86') {
+        return osName.contains('win')
+    }
+    return false
+}
+
+def nativeRuntimeDir = project.file('src/main/native/runtime')
+def nativeLinkDir = project.file('src/main/native/link')
+def nativeLinkInputDir = nativeLinkDir.isDirectory() ? nativeLinkDir : nativeRuntimeDir
+def jniOutputFile = cmakeBuildDir.map { it.file("lib/${jniLibraryName}") }
+
+sourceSets {
+    main {
+        java.srcDirs = []
+        resources.srcDirs = [generatedResourcesDir]
+    }
+}
+
+tasks.register('configureJniBridge', Exec) {
+    onlyIf { canBuildJniBridge() }
+    inputs.dir rootProject.file('desktop/src/main/native')
+    inputs.file new File(nativeLinkInputDir, isWindows ? 'dk.lib' : coreLibraryName)
+    outputs.dir cmakeBuildDir
+
+    def cmakeArgs = [
+            'cmake',
+            '-S', rootProject.file('desktop/src/main/native').absolutePath,
+            '-B', cmakeBuildDir.get().asFile.absolutePath,
+            '-DCMAKE_BUILD_TYPE=Release',
+            "-DXL_DL_NATIVE_DIR=${nativeLinkInputDir.absolutePath}"
+    ]
+    if (platformId == 'windows-x64') {
+        cmakeArgs.addAll(['-A', 'x64'])
+    } else if (platformId == 'windows-x86') {
+        cmakeArgs.addAll(['-A', 'Win32'])
+    }
+    commandLine cmakeArgs
+}
+
+tasks.register('buildJniBridge', Exec) {
+    onlyIf { canBuildJniBridge() }
+    dependsOn 'configureJniBridge'
+    inputs.dir cmakeBuildDir
+    outputs.file jniOutputFile
+
+    commandLine 'cmake', '--build', cmakeBuildDir.get().asFile.absolutePath, '--config', 'Release'
+}
+
+tasks.register('copyJniBridge', Copy) {
+    onlyIf { canBuildJniBridge() }
+    dependsOn 'buildJniBridge'
+    from jniOutputFile
+    into generatedResourcesDir.map { it.dir(resourcePath) }
+}
+
+tasks.register('copyRuntimeLibrary', Copy) {
+    from new File(nativeRuntimeDir, coreLibraryName)
+    into generatedResourcesDir.map { it.dir(resourcePath) }
+}
+
+tasks.named('processResources') {
+    dependsOn 'copyRuntimeLibrary', 'copyJniBridge'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.matching { it.name == 'sourcesJar' }.configureEach {
+    dependsOn 'copyRuntimeLibrary', 'copyJniBridge'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register('verifyNativeResources') {
+    dependsOn 'processResources'
+    doLast {
+        def outputDir = sourceSets.main.output.resourcesDir
+        def core = new File(outputDir, "${resourcePath}/${coreLibraryName}")
+        if (!core.isFile()) {
+            throw new GradleException("Missing ${coreLibraryName} in ${platformId} native package.")
+        }
+        if (canBuildJniBridge()) {
+            def jni = new File(outputDir, "${resourcePath}/${jniLibraryName}")
+            if (!jni.isFile()) {
+                throw new GradleException("Missing ${jniLibraryName} in ${platformId} native package.")
+            }
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn 'verifyNativeResources'
+}
+
+jar {
+    archiveBaseName = "xl-dl-native-${artifactSuffix}"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = "xl-dl-native-${artifactSuffix}"
+        }
+    }
+}

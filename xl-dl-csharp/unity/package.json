@@ -1,0 +1,17 @@
+{
+  "name": "com.xunlei.open.dlsdk",
+  "version": "1.0.0",
+  "displayName": "XL Download SDK",
+  "description": "迅雷 XL Download Unity SDK。",
+  "unity": "2021.3",
+  "author": {
+    "name": "Xunlei"
+  },
+  "samples": [
+    {
+      "displayName": "基础下载示例",
+      "description": "初始化 SDK、获取 loginToken、登录、创建任务、启动任务并轮询状态。",
+      "path": "Samples~/BasicDownload"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+plugins {
+    id 'com.android.application' version '8.13.0' apply false
+    id 'com.android.library' version '8.13.0' apply false
+}
+
+allprojects {
+    group = 'com.xunlei.open'
+    version = '1.0.0'
+}
+
+subprojects {
+    plugins.withId('java') {
+        java {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
+            if (project.path != ':examples:desktop') {
+                withSourcesJar()
+            }
+        }
+
+        tasks.withType(JavaCompile) {
+            options.release = 8
+            options.encoding = 'UTF-8'
+        }
+    }
+}

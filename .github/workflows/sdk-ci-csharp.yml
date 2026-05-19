@@ -1,0 +1,86 @@
+name: SDK CI - C#
+
+on:
+  push:
+    paths:
+      - ".github/workflows/sdk-ci-csharp.yml"
+      - "xl-dl-csharp/**"
+  pull_request:
+    paths:
+      - ".github/workflows/sdk-ci-csharp.yml"
+      - "xl-dl-csharp/**"
+  workflow_dispatch:
+
+env:
+  XL_DL_TEST_TIMEOUT_SECONDS: "900"
+  XL_DL_TEST_URL: ${{ vars.XL_DL_TEST_URL }}
+
+jobs:
+  csharp:
+    name: C# Desktop (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: xl-dl-csharp/dotnet
+    env:
+      APP_ID: ${{ secrets.APP_ID }}
+      API_KEY: ${{ secrets.API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - run: dotnet build Xunlei.XlDl.sln -c Release
+      - name: Run SDK integration test (Linux)
+        if: ${{ runner.os == 'Linux' && env.APP_ID != '' && env.API_KEY != '' }}
+        env:
+          LD_LIBRARY_PATH: ${{ github.workspace }}/xl-dl-csharp/dotnet/native/linux-x64/runtimes/linux-x64/native
+        run: dotnet run --project tests/Xunlei.XlDl.IntegrationTests/Xunlei.XlDl.IntegrationTests.csproj -c Release --no-build
+      - name: Run SDK integration test (macOS)
+        if: ${{ runner.os == 'macOS' && env.APP_ID != '' && env.API_KEY != '' }}
+        env:
+          DYLD_LIBRARY_PATH: ${{ github.workspace }}/xl-dl-csharp/dotnet/native/osx-universal/runtimes/osx/native
+        run: dotnet run --project tests/Xunlei.XlDl.IntegrationTests/Xunlei.XlDl.IntegrationTests.csproj -c Release --no-build
+      - name: Run SDK integration test (Windows)
+        if: ${{ runner.os == 'Windows' && env.APP_ID != '' && env.API_KEY != '' }}
+        shell: bash
+        run: |
+          export PATH="$GITHUB_WORKSPACE/xl-dl-csharp/dotnet/native/win-x64/runtimes/win-x64/native:$PATH"
+          dotnet run --project tests/Xunlei.XlDl.IntegrationTests/Xunlei.XlDl.IntegrationTests.csproj -c Release --no-build
+      - run: dotnet pack src/Xunlei.XlDl/Xunlei.XlDl.csproj -c Release
+      - run: dotnet pack native/linux-x64/Xunlei.XlDl.Native.linux-x64.csproj -c Release
+      - run: dotnet pack native/osx-universal/Xunlei.XlDl.Native.osx-universal.csproj -c Release
+      - run: dotnet pack native/win-x64/Xunlei.XlDl.Native.win-x64.csproj -c Release
+      - run: dotnet pack native/win-x86/Xunlei.XlDl.Native.win-x86.csproj -c Release
+      - run: dotnet build examples/Console/Xunlei.XlDl.ConsoleExample.csproj -c Release
+
+  csharp-unity:
+    name: C# Unity Package
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: xl-dl-csharp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate Unity package metadata and native files
+        shell: bash
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('unity/package.json', 'utf8'))"
+          node -e "for (const file of ['unity/native/com.xunlei.open.dlsdk.native.windows-x64/package.json','unity/native/com.xunlei.open.dlsdk.native.macos-universal/package.json','unity/native/com.xunlei.open.dlsdk.native.android/package.json','unity/native/com.xunlei.open.dlsdk.native.ios/package.json']) JSON.parse(require('fs').readFileSync(file, 'utf8'))"
+          test -f unity/native/com.xunlei.open.dlsdk.native.windows-x64/Runtime/Plugins/Windows/x86_64/dk.dll
+          test -f unity/native/com.xunlei.open.dlsdk.native.macos-universal/Runtime/Plugins/macOS/libdk.dylib
+          test -f unity/native/com.xunlei.open.dlsdk.native.android/Runtime/Plugins/Android/libs/arm64-v8a/libdk.so
+          test -f unity/native/com.xunlei.open.dlsdk.native.ios/Runtime/Plugins/iOS/dk.framework/dk
+          test -f unity/native/com.xunlei.open.dlsdk.native.ios/Runtime/Plugins/iOS/dk.framework/Info.plist
+      - name: Build Unity SDK compile artifact
+        run: dotnet build unity/ci/Xunlei.XlDl.Unity.Compile.csproj -c Release
