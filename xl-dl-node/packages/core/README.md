@@ -1,4 +1,4 @@
-# XL Download Node.js SDK
+# 迅雷下载 Node.js SDK 指南
 
 XL Download Node.js SDK 适用于在 Node.js 桌面工具（例如 Electron 应用）中接入迅雷下载能力，支持 TypeScript 和 JavaScript 调用。
 
@@ -53,53 +53,65 @@ fs.mkdirSync(savePath, { recursive: true });
 
 const sdk = new XLDownloadAPI();
 
-const initResult = sdk.init({
-  appId,
-  appVersion: "1.0",
-  configPath,
-  saveTasks: true
-});
-if (initResult !== ERROR_SUCCESS && initResult !== ERROR_ALREADY_INIT) {
-  throw new Error(`init failed: ${initResult}`);
-}
-
-const token = await sdk.getLoginToken(apiKey);
-const login = sdk.login(token.token);
-if (login.result !== ERROR_SUCCESS) {
-  throw new Error(`login failed: ${login.result}`);
-}
-
-const task = sdk.createP2spTask({
-  url: "https://example.com/file.zip",
-  savePath,
-  saveName: "file.zip"
-});
-
-if (task.result === ERROR_SUCCESS) {
-  sdk.startTask(task.taskId);
-}
-
-while (true) {
-  const state = sdk.getTaskState(task.taskId);
-  process.stdout.write(`\rstate:${state.state.stateCode} downloaded:${state.state.downloadedSize}/${state.state.totalSize} speed:${state.state.speed}`);
-  if (
-    state.result !== ERROR_SUCCESS ||
-    state.state.stateCode === TASK_STATUS_SUCCEEDED ||
-    state.state.stateCode === TASK_STATUS_FAILED
-  ) {
-    console.log();
-    break;
+let initialized = false;
+try {
+  const initResult = sdk.init({
+    appId,
+    appVersion: "1.0",
+    configPath,
+    saveTasks: true
+  });
+  if (initResult !== ERROR_SUCCESS && initResult !== ERROR_ALREADY_INIT) {
+    throw new Error(`init failed: ${initResult}`);
   }
-  await new Promise(resolve => setTimeout(resolve, 1000));
-}
+  initialized = true;
 
-sdk.uninit();
+  const token = await sdk.getLoginToken(apiKey);
+  const login = sdk.login(token.token);
+  if (login.result !== ERROR_SUCCESS) {
+    throw new Error(`login failed: ${login.result}`);
+  }
+
+  const task = sdk.createP2spTask({
+    url: "https://example.com/file.zip",
+    savePath,
+    saveName: "file.zip"
+  });
+
+  if (task.result !== ERROR_SUCCESS) {
+    throw new Error(`create task failed: ${task.result}`);
+  }
+
+  const startResult = sdk.startTask(task.taskId);
+  if (startResult !== ERROR_SUCCESS) {
+    throw new Error(`start task failed: ${startResult}`);
+  }
+
+  while (true) {
+    const state = sdk.getTaskState(task.taskId);
+    process.stdout.write(`\rstate:${state.state.stateCode} downloaded:${state.state.downloadedSize}/${state.state.totalSize} speed:${state.state.speed}`);
+    if (
+      state.result !== ERROR_SUCCESS ||
+      state.state.stateCode === TASK_STATUS_SUCCEEDED ||
+      state.state.stateCode === TASK_STATUS_FAILED
+    ) {
+      console.log();
+      break;
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+} finally {
+  if (initialized) {
+    sdk.uninit();
+  }
+}
 ```
 
-完整可运行示例见 [`examples/basic-download.ts`](https://github.com/xunlei-open/xunlei-dlsdk/blob/main/xl-dl-node/examples/basic-download.ts)。
+完整可运行示例见 [示例代码](https://github.com/xunlei-open/xunlei-dlsdk/blob/main/xl-dl-node/examples/basic-download.ts)。
 
 ## 相关文档
 
+- [Github](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-node)
 - [接入流程与凭证申请](https://open.xunlei.com/doc?doc=access_flow)
 - [API 参考文档](https://open.xunlei.com/doc?doc=xl_dl_init)
 - [错误码说明](https://open.xunlei.com/doc?doc=error_code)

@@ -1,4 +1,4 @@
-# com.xunlei.open.dlsdk.native.android
+# 迅雷下载 Unity Android 平台包指南
 
 这是 `com.xunlei.open.dlsdk` 的 Android 平台动态库包。
 

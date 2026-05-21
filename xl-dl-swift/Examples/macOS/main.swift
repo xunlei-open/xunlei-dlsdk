@@ -17,16 +17,32 @@ print("version result:\(version.result) version:\(version.version)")
 
 let initResult = sdk.initialize(appId: appId, appVersion: appVersion, configPath: configPath, saveTasks: true)
 print("init result:\(initResult)")
+guard initResult == XLDLSuccess || initResult == XLDLAlreadyInit else {
+    throw NSError(domain: "XlDlSwiftExample", code: Int(initResult), userInfo: [NSLocalizedDescriptionKey: "init failed: \(initResult)"])
+}
+defer {
+    let uninitResult = sdk.uninit()
+    print("uninit result:\(uninitResult)")
+}
 
 let token = try sdk.getLoginToken(apiKey: apiKey)
 let login = sdk.login(token: token.token)
 print("login result:\(login.result) session:\(login.sessionId)")
+guard login.result == XLDLSuccess else {
+    throw NSError(domain: "XlDlSwiftExample", code: Int(login.result), userInfo: [NSLocalizedDescriptionKey: "login failed: \(login.result)"])
+}
 
 let create = sdk.createP2SPTask(url: taskURL.absoluteString, savePath: savePath, saveName: taskURL.lastPathComponent)
 print("create task result:\(create.result) taskId:\(create.taskId)")
+guard create.result == XLDLSuccess else {
+    throw NSError(domain: "XlDlSwiftExample", code: Int(create.result), userInfo: [NSLocalizedDescriptionKey: "create task failed: \(create.result)"])
+}
 
 let startResult = sdk.startTask(taskId: create.taskId)
 print("start task result:\(startResult)")
+guard startResult == XLDLSuccess else {
+    throw NSError(domain: "XlDlSwiftExample", code: Int(startResult), userInfo: [NSLocalizedDescriptionKey: "start task failed: \(startResult)"])
+}
 
 while true {
     let stateResult = sdk.getTaskState(taskId: create.taskId)
@@ -41,6 +57,3 @@ while true {
     }
     Thread.sleep(forTimeInterval: 1)
 }
-
-let uninitResult = sdk.uninit()
-print("uninit result:\(uninitResult)")

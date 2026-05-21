@@ -1,4 +1,4 @@
-# Java 公共 API
+# 迅雷下载 Java 公共 API 指南
 
 这里说明 Java Desktop 和 Java Android 共用的下载 API。应用通过同一个入口完成初始化、登录、任务创建和任务管理。
 

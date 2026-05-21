@@ -1,4 +1,4 @@
-# xl-dl-native-macos-universal
+# 迅雷下载 Java macOS Universal 平台包指南
 
 这是 `xl-dl-desktop-1.0.0.jar` 的 macOS universal 平台动态库包。
 

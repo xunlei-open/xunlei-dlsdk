@@ -1,4 +1,4 @@
-# com.xunlei.open.dlsdk.native.windows-x64
+# 迅雷下载 Unity Windows x64 平台包指南
 
 这是 `com.xunlei.open.dlsdk` 的 Windows x64 平台动态库包。
 

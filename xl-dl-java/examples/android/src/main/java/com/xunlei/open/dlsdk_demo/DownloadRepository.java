@@ -81,13 +81,13 @@ public class DownloadRepository {
     }
 
     private boolean ensureInitialized() {
-        if (innerInitXunleiSDK()) {
-            startProgressMonitoring();
-            loadTasks();
-            return true;
-        } else {
+        if (!innerInitXunleiSDK()) {
             return false;
         }
+
+        startProgressMonitoring();
+        loadTasks();
+        return true;
     }
 
     private boolean innerInitXunleiSDK() {
@@ -107,14 +107,13 @@ public class DownloadRepository {
                     Log.i(TAG, "XLDownloadAPI.login loginToken:" + loginToken);
                     XLDownloadAPI.LoginResult login = XLDownloadAPI.login(loginToken);
                     int loginResult = login.result;
-                    if (loginResult == XLDownloadAPI.ERROR_SUCCESS) {
-                        mSessionID = login.sessionId;
-                        Log.d(TAG, "Login success, sessionID: " + mSessionID);
-                        return true;
-                    } else {
+                    if (loginResult != XLDownloadAPI.ERROR_SUCCESS) {
                         Log.e(TAG, "Login failed: " + loginResult);
                         return false;
                     }
+                    mSessionID = login.sessionId;
+                    Log.d(TAG, "Login success, sessionID: " + mSessionID);
+                    return true;
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Init XunLei SDK failed", e);
@@ -127,13 +126,15 @@ public class DownloadRepository {
     private String getTaskFileName(long taskId) {
         XLDownloadAPI.StringResult name = XLDownloadAPI.getTaskInfo(taskId, "save_name");
         int result = name.result;
-        if (result == XLDownloadAPI.ERROR_SUCCESS) {
-            try {
-                JSONObject json = new JSONObject(name.value);
-                return json.optString("save_name");
-            } catch (JSONException e) {
-                Log.e(TAG, "Parse task name failed", e);
-            }
+        if (result != XLDownloadAPI.ERROR_SUCCESS) {
+            return "Unknown";
+        }
+
+        try {
+            JSONObject json = new JSONObject(name.value);
+            return json.optString("save_name");
+        } catch (JSONException e) {
+            Log.e(TAG, "Parse task name failed", e);
         }
         return "Unknown";
     }
@@ -176,15 +177,16 @@ public class DownloadRepository {
                 XLDownloadAPI.TaskStateResult stateResult = XLDownloadAPI.getTaskState(task.getTaskId());
                 int result = stateResult.result;
 
-                if (result == XLDownloadAPI.ERROR_SUCCESS) {
-                    XLDownloadAPI.TaskState state = stateResult.state;
-                    if (state.stateCode != task.getStatus() || state.downloadedSize != task.getDownloadedSize() || state.speed != task.getSpeed()) {
+                if (result != XLDownloadAPI.ERROR_SUCCESS) {
+                    continue;
+                }
 
-                        DownloadTask updatedTask = new DownloadTask(task.getTaskId(), task.getFileName(), state.stateCode, state.downloadedSize, state.totalSize, state.speed);
+                XLDownloadAPI.TaskState state = stateResult.state;
+                if (state.stateCode != task.getStatus() || state.downloadedSize != task.getDownloadedSize() || state.speed != task.getSpeed()) {
+                    DownloadTask updatedTask = new DownloadTask(task.getTaskId(), task.getFileName(), state.stateCode, state.downloadedSize, state.totalSize, state.speed);
 
-                        taskMap.put(task.getTaskId(), updatedTask);
-                        hasChanges = true;
-                    }
+                    taskMap.put(task.getTaskId(), updatedTask);
+                    hasChanges = true;
                 }
             }
 
@@ -208,26 +210,25 @@ public class DownloadRepository {
                 XLDownloadAPI.CreateTaskResult create = XLDownloadAPI.createP2spTask(url, savaPath, fileName);
                 int result = create.result;
 
-                if (result == XLDownloadAPI.ERROR_SUCCESS) {
-
-                    try {
-                        int startResult = XLDownloadAPI.startTask(create.taskId);
-                        if (startResult != XLDownloadAPI.ERROR_SUCCESS) {
-                            XLDownloadAPI.deleteTask(create.taskId, true);
-                            Log.e(TAG, "Failed to start task: " + startResult);
-                            return startResult;
-                        }
-
-                        loadTasks();
-                        return XLDownloadAPI.ERROR_SUCCESS;
-                    } catch (Exception e) {
-                        Log.e(TAG, "Error getting task token", e);
-                        XLDownloadAPI.deleteTask(create.taskId, true);
-                        return XLDownloadAPI.ERROR_AUTH_TOKEN_VERIFY_FAILED;
-                    }
-                } else {
+                if (result != XLDownloadAPI.ERROR_SUCCESS) {
                     Log.e(TAG, "Create task failed: " + result);
                     return result;
+                }
+
+                try {
+                    int startResult = XLDownloadAPI.startTask(create.taskId);
+                    if (startResult != XLDownloadAPI.ERROR_SUCCESS) {
+                        XLDownloadAPI.deleteTask(create.taskId, true);
+                        Log.e(TAG, "Failed to start task: " + startResult);
+                        return startResult;
+                    }
+
+                    loadTasks();
+                    return XLDownloadAPI.ERROR_SUCCESS;
+                } catch (Exception e) {
+                    Log.e(TAG, "Error getting task token", e);
+                    XLDownloadAPI.deleteTask(create.taskId, true);
+                    return XLDownloadAPI.ERROR_AUTH_TOKEN_VERIFY_FAILED;
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error creating download task", e);
@@ -268,11 +269,11 @@ public class DownloadRepository {
 
         synchronized (taskOperationLock) {
             int result = XLDownloadAPI.stopTask(taskId);
-            if (result == XLDownloadAPI.ERROR_SUCCESS) {
-                updateTaskStatus(taskId);
-            } else {
+            if (result != XLDownloadAPI.ERROR_SUCCESS) {
                 Log.e(TAG, "Failed to pause task: " + result);
+                return result;
             }
+            updateTaskStatus(taskId);
             return result;
         }
     }
@@ -284,11 +285,11 @@ public class DownloadRepository {
 
         synchronized (taskOperationLock) {
             int result = XLDownloadAPI.startTask(taskId);
-            if (result == XLDownloadAPI.ERROR_SUCCESS) {
-                updateTaskStatus(taskId);
-            } else {
+            if (result != XLDownloadAPI.ERROR_SUCCESS) {
                 Log.e(TAG, "Failed to resume task: " + result);
+                return result;
             }
+            updateTaskStatus(taskId);
             return result;
         }
     }
@@ -300,12 +301,12 @@ public class DownloadRepository {
 
         synchronized (taskOperationLock) {
             int result = XLDownloadAPI.deleteTask(taskId, true);
-            if (result == XLDownloadAPI.ERROR_SUCCESS) {
-                taskMap.remove(taskId);
-                notifyTasksChanged();
-            } else {
+            if (result != XLDownloadAPI.ERROR_SUCCESS) {
                 Log.e(TAG, "Failed to delete task: " + result);
+                return result;
             }
+            taskMap.remove(taskId);
+            notifyTasksChanged();
             return result;
         }
     }
@@ -348,11 +349,12 @@ public class DownloadRepository {
         XLDownloadAPI.TaskStateResult stateResult = XLDownloadAPI.getTaskState(taskId);
         int result = stateResult.result;
 
-        if (result == XLDownloadAPI.ERROR_SUCCESS) {
-            XLDownloadAPI.TaskState state = stateResult.state;
-            return new DownloadTask(taskId, getTaskFileName(taskId), state.stateCode, state.downloadedSize, state.totalSize, state.speed);
+        if (result != XLDownloadAPI.ERROR_SUCCESS) {
+            return null;
         }
-        return null;
+
+        XLDownloadAPI.TaskState state = stateResult.state;
+        return new DownloadTask(taskId, getTaskFileName(taskId), state.stateCode, state.downloadedSize, state.totalSize, state.speed);
     }
 
     private String getLoginToken() throws Exception {

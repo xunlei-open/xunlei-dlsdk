@@ -1,6 +1,6 @@
-# 平台动态库包
+# 迅雷下载 .NET 平台动态库包指南
 
-`Xunlei.Open.DlSdk` 的平台动态库按 native NuGet 包分发。项目可以按要支持的目标运行时引用对应 native 包，跨 RID 发布时可以引用多个。
+`Xunlei.Open.DlSdk` 的平台动态库通过 native NuGet 包提供。项目可以按要支持的目标运行时引用对应 native 包，跨 RID 发布时可以引用多个。
 
 | 运行时 | 包名 |
 | --- | --- |

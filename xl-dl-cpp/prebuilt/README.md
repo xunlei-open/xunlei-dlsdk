@@ -1,6 +1,6 @@
-# 平台预编译库
+# 迅雷下载 C++ 平台预编译库指南
 
-这里按桌面平台整理预置运行时库。可以下载 GitHub Release 里的 [`xunlei-dlsdk-cpp-1.0.0.zip`](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-cpp-1.0.0.zip)，然后选择目标平台对应的目录。
+这里按桌面平台整理预置运行时库。下载 [xunlei-dlsdk-cpp-1.0.0.zip](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-cpp-1.0.0.zip) 后，可以选择目标平台对应的目录。
 
 当前支持的平台：
 

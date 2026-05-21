@@ -1,4 +1,4 @@
-# com.xunlei.open.dlsdk.native.ios
+# 迅雷下载 Unity iOS 平台包指南
 
 这个包提供 `com.xunlei.open.dlsdk` 在 Unity iOS Player 使用的 `dk.framework`。
 

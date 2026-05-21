@@ -1,4 +1,4 @@
-# xl-dl-native-linux-x64
+# 迅雷下载 Java Linux x64 平台包指南
 
 这是 `xl-dl-desktop-1.0.0.jar` 的 Linux x64 平台动态库包。
 

@@ -1,4 +1,4 @@
-# 桌面平台动态库包
+# 迅雷下载 Java Desktop 平台动态库包指南
 
 Java Desktop 的平台动态库按 native JAR 打包，并随桌面端压缩包一起发布。
 

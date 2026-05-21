@@ -1,4 +1,4 @@
-# xl-dl-desktop
+# 迅雷下载 Java Desktop SDK 指南
 
 XL Download Java Desktop SDK 适用于在 Windows、macOS 和 Linux 的 Java 桌面应用中接入迅雷下载能力。
 
@@ -54,6 +54,7 @@ public class App {
 
         XLDownloadAPI.LoginResult login = XLDownloadAPI.login(token.token);
         if (login.result != XLDownloadAPI.ERROR_SUCCESS) {
+            XLDownloadAPI.uninit();
             throw new IllegalStateException("login failed: " + login.result);
         }
 
@@ -61,8 +62,14 @@ public class App {
                 "https://example.com/file.zip",
                 "/tmp/ThunderDownload",
                 "file.zip");
-        if (task.result == XLDownloadAPI.ERROR_SUCCESS) {
-            XLDownloadAPI.startTask(task.taskId);
+        if (task.result != XLDownloadAPI.ERROR_SUCCESS) {
+            XLDownloadAPI.uninit();
+            throw new IllegalStateException("create task failed: " + task.result);
+        }
+        int startResult = XLDownloadAPI.startTask(task.taskId);
+        if (startResult != XLDownloadAPI.ERROR_SUCCESS) {
+            XLDownloadAPI.uninit();
+            throw new IllegalStateException("start task failed: " + startResult);
         }
 
         while (true) {
@@ -88,10 +95,11 @@ public class App {
 
 ## 示例项目
 
-完整示例见 [`examples/desktop`](../examples/desktop)。
+完整示例见 [示例代码](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-java/examples/desktop)。
 
 ## 相关文档
 
+- [Github](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-java/desktop)
 - [接入流程与凭证申请](https://open.xunlei.com/doc?doc=access_flow)
 - [API 参考文档](https://open.xunlei.com/doc?doc=xl_dl_init)
 - [错误码说明](https://open.xunlei.com/doc?doc=error_code)

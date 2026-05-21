@@ -1,4 +1,4 @@
-# XL Download Python SDK
+# 迅雷下载 Python SDK 指南
 
 XL Download Python SDK 适用于在 Python 脚本或桌面工具中接入迅雷下载能力。
 
@@ -78,39 +78,46 @@ init_result = sdk.init(app_id, "1.0", config_path, save_tasks=True)
 if init_result not in (ERROR_SUCCESS, ERROR_ALREADY_INIT):
     raise RuntimeError(f"init failed: {init_result}")
 
-code, login_token, _expires_in, message = sdk.get_login_token(api_key)
-if code != 0:
-    raise RuntimeError(f"get loginToken failed: {message}")
+try:
+    code, login_token, _expires_in, message = sdk.get_login_token(api_key)
+    if code != 0:
+        raise RuntimeError(f"get loginToken failed: {message}")
 
-login_result, session_id = sdk.login(login_token)
-if login_result != ERROR_SUCCESS:
-    raise RuntimeError(f"login failed: {login_result}")
+    login_result, session_id = sdk.login(login_token)
+    if login_result != ERROR_SUCCESS:
+        raise RuntimeError(f"login failed: {login_result}")
 
-create_result, task_id = sdk.create_p2sp_task(
-    "https://example.com/file.zip",
-    save_path,
-    "file.zip",
-)
-if create_result == ERROR_SUCCESS:
-    sdk.start_task(task_id)
+    create_result, task_id = sdk.create_p2sp_task(
+        "https://example.com/file.zip",
+        save_path,
+        "file.zip",
+    )
+    if create_result != ERROR_SUCCESS:
+        raise RuntimeError(f"create task failed: {create_result}")
 
-while True:
-    result, state = sdk.get_task_state(task_id)
-    if state is None:
-        break
-    print(f"\rstate:{state.state_code} downloaded:{state.downloaded_size}/{state.total_size} speed:{state.speed}", end="", flush=True)
-    if state.state_code in (TASK_STATUS_SUCCEEDED, TASK_STATUS_FAILED):
-        print()
-        break
-    time.sleep(1)
+    start_result = sdk.start_task(task_id)
+    if start_result != ERROR_SUCCESS:
+        raise RuntimeError(f"start task failed: {start_result}")
 
-sdk.uninit()
+    while True:
+        result, state = sdk.get_task_state(task_id)
+        if state is None:
+            break
+        print(f"\rstate:{state.state_code} downloaded:{state.downloaded_size}/{state.total_size} speed:{state.speed}", end="", flush=True)
+        if state.state_code in (TASK_STATUS_SUCCEEDED, TASK_STATUS_FAILED):
+            print()
+            break
+        time.sleep(1)
+
+finally:
+    sdk.uninit()
 ```
 
-完整可运行示例见 `examples/basic_download.py`。
+完整可运行示例见 [示例代码](https://github.com/xunlei-open/xunlei-dlsdk/blob/main/xl-dl-python/examples/basic_download.py)。
 
 ## 相关文档
 
+- [Github](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-python)
 - [接入流程与凭证申请](https://open.xunlei.com/doc?doc=access_flow)
 - [API 参考文档](https://open.xunlei.com/doc?doc=xl_dl_init)
 - [错误码说明](https://open.xunlei.com/doc?doc=error_code)

@@ -1,6 +1,8 @@
-# Python 示例
+# 迅雷下载 Python 示例指南
 
-先按上级 README 安装 `xunlei-open-dlsdk` 和运行环境需要的 native 包。本仓库源码调试时，也可以安装本地包后运行：
+先安装 `xunlei-open-dlsdk` 和运行环境需要的 native 包。安装说明见 [Python SDK 文档](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-python)。
+
+在 SDK 仓库内调试本示例时，也可以安装本地包后运行：
 
 ```bash
 python -m pip install -e .

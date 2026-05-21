@@ -1,4 +1,4 @@
-# iOS 示例
+# 迅雷下载 Swift iOS 示例指南
 
 XL Download Swift iOS 接入适用于 iOS 13 或更高版本。
 
@@ -16,11 +16,9 @@ XL Download Swift iOS 接入适用于 iOS 13 或更高版本。
 
 ## 安装
 
-下载 GitHub Release 压缩包并解压：
+下载 [xunlei-dlsdk-swift-1.0.0.zip](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-swift-1.0.0.zip) 并解压：
 
 ```bash
-curl -L -o xunlei-dlsdk-swift-1.0.0.zip \
-  https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-swift-1.0.0.zip
 unzip xunlei-dlsdk-swift-1.0.0.zip
 ```
 

@@ -1,6 +1,6 @@
-# Unity 平台动态库包
+# 迅雷下载 Unity 平台动态库包指南
 
-Unity SDK 的 API 包为 `com.xunlei.open.dlsdk`，平台动态库按 native 包分发。
+Unity SDK 的 API 包为 `com.xunlei.open.dlsdk`，平台动态库通过对应的 native UPM 包提供。
 
 当前支持的平台：
 

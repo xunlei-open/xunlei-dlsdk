@@ -1,4 +1,4 @@
-# Unity UPM 包
+# 迅雷下载 Unity SDK 指南
 
 XL Download Unity SDK 适用于在 Unity 游戏或应用中接入迅雷下载能力，支持 Windows、macOS、Android 和 iOS 目标平台。
 
@@ -40,19 +40,6 @@ using Xunlei.XlDl.Unity;
 | Android arm64-v8a | `"com.xunlei.open.dlsdk.native.android": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.android#v1.0.0"` |
 | iOS | `"com.xunlei.open.dlsdk.native.ios": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.ios#v1.0.0"` |
 
-本地 clone 仓库后可以使用 `file:` 路径：
-
-```json
-{
-  "dependencies": {
-    "com.xunlei.open.dlsdk": "file:../sdk_v2/xl-dl-csharp/unity",
-    "com.xunlei.open.dlsdk.native.windows-x64": "file:../sdk_v2/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.windows-x64"
-  }
-}
-```
-
-跨平台项目按同样方式添加其他目标平台的 `file:` native 包路径。
-
 ## 使用
 
 ```csharp
@@ -61,14 +48,40 @@ using Xunlei.XlDl.Unity;
 var sdk = new XLDownloadAPI();
 const string configPath = "/tmp/xl_dl_sdk_conf";
 int initResult = sdk.Initialize(appId, "1.0", configPath, true);
-yield return sdk.GetLoginToken(apiKey, token => {
-    var login = sdk.Login(token.Token);
-});
+if (initResult != XLDownloadAPI.ErrorSuccess &&
+    initResult != XLDownloadAPI.ErrorAlreadyInit)
+{
+    yield break;
+}
+
+LoginTokenResult loginToken = null;
+string loginTokenError = null;
+yield return sdk.GetLoginToken(apiKey, token => loginToken = token, error => loginTokenError = error);
+if (loginTokenError != null || loginToken == null)
+{
+    sdk.Uninit();
+    yield break;
+}
+
+var login = sdk.Login(loginToken.Token);
+if (login.Result != XLDownloadAPI.ErrorSuccess)
+{
+    sdk.Uninit();
+    yield break;
+}
 
 var create = sdk.CreateP2spTask("https://example.com/file.zip", "/tmp/ThunderDownload", "file.zip");
-if (create.Result == XLDownloadAPI.ErrorSuccess)
+if (create.Result != XLDownloadAPI.ErrorSuccess)
 {
-    sdk.StartTask(create.TaskId);
+    sdk.Uninit();
+    yield break;
+}
+
+int startResult = sdk.StartTask(create.TaskId);
+if (startResult != XLDownloadAPI.ErrorSuccess)
+{
+    sdk.Uninit();
+    yield break;
 }
 
 while (true)
@@ -82,14 +95,17 @@ while (true)
     }
     yield return new WaitForSeconds(1);
 }
+
+sdk.Uninit();
 ```
 
 ## 示例项目
 
-完整示例见 Package Manager 中的 `基础下载示例`，源码位于 [`Samples~/BasicDownload`](./Samples~/BasicDownload)。
+完整示例见 Package Manager 中的 `基础下载示例`，源码位于 [示例代码](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-csharp/unity/Samples~/BasicDownload)。
 
 ## 相关文档
 
+- [Github](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-csharp/unity)
 - [接入流程与凭证申请](https://open.xunlei.com/doc?doc=access_flow)
 - [API 参考文档](https://open.xunlei.com/doc?doc=xl_dl_init)
 - [错误码说明](https://open.xunlei.com/doc?doc=error_code)

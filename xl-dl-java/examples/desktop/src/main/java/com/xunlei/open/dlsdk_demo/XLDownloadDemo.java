@@ -53,7 +53,7 @@ public class XLDownloadDemo {
             + "\n saveTasks:true"
             + "\n initResult:" + initResult);
 
-        if (initResult != XLDownloadAPI.ERROR_SUCCESS) {
+        if (initResult != XLDownloadAPI.ERROR_SUCCESS && initResult != XLDownloadAPI.ERROR_ALREADY_INIT) {
             return;
         }
 
@@ -79,7 +79,8 @@ public class XLDownloadDemo {
             + "\n sessionID:" + sessionID);
 
         if (loginResult != XLDownloadAPI.ERROR_SUCCESS) {
-//            XLDownloadAPI.uninit();
+            XLDownloadAPI.uninit();
+            return;
         }
 
         XLDownloadAPI.TaskListResult unfinishedTasks = XLDownloadAPI.getUnfinishedTasks();
@@ -106,6 +107,7 @@ public class XLDownloadDemo {
 
         if (createTaskResult != XLDownloadAPI.ERROR_SUCCESS) {
             XLDownloadAPI.uninit();
+            return;
         }
 
         int startTaskResult = XLDownloadAPI.startTask(taskID);

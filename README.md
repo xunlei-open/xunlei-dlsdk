@@ -1,4 +1,4 @@
-# 迅雷下载 SDK
+# 迅雷下载 SDK 指南
 
 **官网**：<https://open.xunlei.com>
 
@@ -14,24 +14,25 @@
 ## 快速开始
 
 1. 前往[接入流程](https://open.xunlei.com/doc?doc=access_flow)注册并获取 `APP ID` 和 `API Key`。
-2. 按编程语言选择下方对应目录，查看 README 安装 SDK。
-3. 参考 `examples/` 下的完整示例验证接入。
+2. 按编程语言选择下方对应 SDK 文档安装 SDK。
+3. 参考对应 SDK 文档中的完整示例验证接入。
 
 ## 支持的编程语言
 
 | SDK | Windows x64 | Windows x86 | macOS Universal | Linux x64 | Android | iOS |
 | --- | --- | --- | --- | --- | --- | --- |
-| [C++](./xl-dl-cpp/) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| [Node.js](./xl-dl-node/) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| [.NET / C#](./xl-dl-csharp/) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| [Unity](./xl-dl-csharp/unity/) | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ |
-| [Java Desktop](./xl-dl-java/) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| [Java Android](./xl-dl-java/) | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| [Swift](./xl-dl-swift/) | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ |
-| [Python](./xl-dl-python/) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| [C++](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-cpp) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| [Node.js](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-node) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| [.NET / C#](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-csharp) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| [Unity](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-csharp/unity) | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ |
+| [Java Desktop](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-java/desktop) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| [Java Android](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-java/android) | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| [Swift](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-swift) | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ |
+| [Python](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-python) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
 
 ## 相关文档
 
+- [Github](https://github.com/xunlei-open/xunlei-dlsdk)
 - [接入流程](https://open.xunlei.com/doc?doc=access_flow)
 - [API 参考文档](https://open.xunlei.com/doc?doc=xl_dl_init)
 - [错误码说明](https://open.xunlei.com/doc?doc=error_code)

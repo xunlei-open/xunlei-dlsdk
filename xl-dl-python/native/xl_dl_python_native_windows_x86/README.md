@@ -1,4 +1,4 @@
-# xunlei-open-dlsdk-native-windows-x86
+# 迅雷下载 Python Windows x86 平台包指南
 
 这是 `xunlei-open-dlsdk` 的 Windows x86 平台动态库包。
 

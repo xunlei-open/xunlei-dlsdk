@@ -1,4 +1,4 @@
-# XL Download .NET Desktop SDK
+# 迅雷下载 .NET Desktop SDK 指南
 
 XL Download .NET Desktop SDK 适用于在 Windows、macOS 和 Linux 的 .NET 桌面应用中接入迅雷下载能力。
 
@@ -64,9 +64,15 @@ var task = sdk.CreateP2spTask(
     "/tmp/ThunderDownload",
     "file.zip");
 
-if (task.Result == XLDownloadAPI.ErrorSuccess)
+if (task.Result != XLDownloadAPI.ErrorSuccess)
 {
-    sdk.StartTask(task.TaskId);
+    throw new InvalidOperationException($"create task failed: {task.Result}");
+}
+
+int startResult = sdk.StartTask(task.TaskId);
+if (startResult != XLDownloadAPI.ErrorSuccess)
+{
+    throw new InvalidOperationException($"start task failed: {startResult}");
 }
 
 while (true)
@@ -83,16 +89,15 @@ while (true)
 
     await Task.Delay(TimeSpan.FromSeconds(1));
 }
-
-sdk.Uninit();
 ```
 
 ## 示例项目
 
-完整控制台示例见 [`examples/Console`](./examples/Console)。
+完整控制台示例见 [示例代码](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-csharp/dotnet/examples/Console)。
 
 ## 相关文档
 
+- [Github](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-csharp/dotnet)
 - [接入流程与凭证申请](https://open.xunlei.com/doc?doc=access_flow)
 - [API 参考文档](https://open.xunlei.com/doc?doc=xl_dl_init)
 - [错误码说明](https://open.xunlei.com/doc?doc=error_code)

@@ -17,62 +17,65 @@ async function main() {
   const version = sdk.version();
   console.log("version", version);
 
-  const initResult = sdk.init({
-    appId,
-    appVersion,
-    configPath,
-    saveTasks: true
-  });
-  console.log("init", initResult);
-  if (initResult !== ERROR_SUCCESS && initResult !== ERROR_ALREADY_INIT) {
-    return;
-  }
-
-  const token = await sdk.getLoginToken(apiKey);
-  if (token.code !== 0 || !token.token) {
-    throw new Error(`获取 loginToken 失败：${token.message}`);
-  }
-
-  const login = sdk.login(token.token);
-  console.log("login", login.result, login.sessionId);
-  if (login.result !== ERROR_SUCCESS) {
-    sdk.uninit();
-    return;
-  }
-
-  const saveName = path.basename(new URL(taskUrl).pathname);
-  const create = sdk.createP2spTask({
-    url: taskUrl,
-    savePath,
-    saveName
-  });
-  console.log("create task", create);
-  if (create.result !== ERROR_SUCCESS) {
-    sdk.uninit();
-    return;
-  }
-
-  const startResult = sdk.startTask(create.taskId);
-  console.log("start", startResult);
-  if (startResult !== ERROR_SUCCESS) {
-    sdk.uninit();
-    return;
-  }
-
-  while (true) {
-    const state = sdk.getTaskState(create.taskId);
-    console.log("state", state);
-    if (
-      state.result !== ERROR_SUCCESS ||
-      state.state.stateCode === TASK_STATUS_SUCCEEDED ||
-      state.state.stateCode === TASK_STATUS_FAILED
-    ) {
-      break;
+  let initialized = false;
+  try {
+    const initResult = sdk.init({
+      appId,
+      appVersion,
+      configPath,
+      saveTasks: true
+    });
+    console.log("init", initResult);
+    if (initResult !== ERROR_SUCCESS && initResult !== ERROR_ALREADY_INIT) {
+      return;
     }
-    await new Promise(resolve => setTimeout(resolve, 1000));
-  }
+    initialized = true;
 
-  console.log("uninit", sdk.uninit());
+    const token = await sdk.getLoginToken(apiKey);
+    if (token.code !== 0 || !token.token) {
+      throw new Error(`获取 loginToken 失败：${token.message}`);
+    }
+
+    const login = sdk.login(token.token);
+    console.log("login", login.result, login.sessionId);
+    if (login.result !== ERROR_SUCCESS) {
+      return;
+    }
+
+    const saveName = path.basename(new URL(taskUrl).pathname);
+    const create = sdk.createP2spTask({
+      url: taskUrl,
+      savePath,
+      saveName
+    });
+    console.log("create task", create);
+    if (create.result !== ERROR_SUCCESS) {
+      return;
+    }
+
+    const startResult = sdk.startTask(create.taskId);
+    console.log("start", startResult);
+    if (startResult !== ERROR_SUCCESS) {
+      return;
+    }
+
+    while (true) {
+      const state = sdk.getTaskState(create.taskId);
+      console.log("state", state);
+      if (
+        state.result !== ERROR_SUCCESS ||
+        state.state.stateCode === TASK_STATUS_SUCCEEDED ||
+        state.state.stateCode === TASK_STATUS_FAILED
+      ) {
+        break;
+      }
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  } finally {
+    if (initialized) {
+      console.log("uninit", sdk.uninit());
+    }
+  }
 }
 
 main().catch(error => {

@@ -1,4 +1,4 @@
-# XL Download C++ SDK
+# 迅雷下载 C++ SDK 指南
 
 XL Download C++ SDK 适用于在 Windows、macOS 和 Linux 桌面应用中接入迅雷下载能力。
 
@@ -15,26 +15,17 @@ XL Download C++ SDK 适用于在 Windows、macOS 和 Linux 桌面应用中接入
 
 ## 安装
 
-C++ SDK 通过 GitHub Release 源码包分发，包内已在 `prebuilt/` 下携带各平台运行时库。
-
-下载 GitHub Release 源码包：
+下载 [xunlei-dlsdk-cpp-1.0.0.zip](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-cpp-1.0.0.zip)，解压后安装到本地目录：
 
 ```bash
-curl -L -o xunlei-dlsdk-cpp-1.0.0.zip \
-  https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-cpp-1.0.0.zip
 unzip xunlei-dlsdk-cpp-1.0.0.zip
-```
-
-安装到本地目录：
-
-```bash
 cmake -S xunlei-dlsdk-cpp -B build-sdk \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=/tmp/xunlei-dlsdk-cpp
 cmake --install build-sdk
 ```
 
-Release 源码包包含头文件、CMake package、示例工程和 `prebuilt/` 平台运行时库。
+压缩包包含头文件、CMake package、示例工程和 `prebuilt/` 平台运行时库。
 
 安装指定平台运行时库时，可以传入 `XL_DL_CPP_NATIVE_PLATFORM`：
 
@@ -45,7 +36,7 @@ Release 源码包包含头文件、CMake package、示例工程和 `prebuilt/` �
 | `macos-universal` | macOS Universal：`lib/libdk.dylib` |
 | `linux-x64` | Linux x64：`lib/libdk.so` |
 
-进入解压后的源码目录，指定平台安装：
+进入解压后的 SDK 目录，指定平台安装：
 
 ```bash
 cd xunlei-dlsdk-cpp
@@ -101,6 +92,10 @@ int main() {
     }
 
     xl_dl::login_token_result token = xl_dl::get_login_token("your-api-key");
+    if (token.code != 0 || token.token.empty()) {
+        xl_dl_uninit();
+        return token.code;
+    }
 
     char session_id[XL_DL_MAX_SESSION_ID_LEN] = {0};
     code = xl_dl_login(token.token.c_str(), session_id);
@@ -117,8 +112,15 @@ int main() {
 
     uint64_t task_id = 0;
     code = xl_dl_create_p2sp_task(&task, &task_id);
-    if (code == XL_DL_ERROR_SUCCESS) {
-        xl_dl_start_task(task_id);
+    if (code != XL_DL_ERROR_SUCCESS) {
+        xl_dl_uninit();
+        return code;
+    }
+
+    code = xl_dl_start_task(task_id);
+    if (code != XL_DL_ERROR_SUCCESS) {
+        xl_dl_uninit();
+        return code;
     }
 
     while (true) {
@@ -145,10 +147,11 @@ int main() {
 }
 ```
 
-完整可运行示例见 `examples/`。
+完整可运行示例见 [示例代码](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-cpp/examples)。
 
 ## 相关文档
 
+- [Github](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-cpp)
 - [接入流程与凭证申请](https://open.xunlei.com/doc?doc=access_flow)
 - [API 参考文档](https://open.xunlei.com/doc?doc=xl_dl_init)
 - [错误码说明](https://open.xunlei.com/doc?doc=error_code)

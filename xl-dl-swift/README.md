@@ -1,4 +1,4 @@
-# XL Download Swift SDK
+# 迅雷下载 Swift SDK 指南
 
 XL Download Swift SDK 适用于在 macOS 和 iOS 应用中接入迅雷下载能力，面向 Swift 项目使用。
 
@@ -18,16 +18,14 @@ XL Download Swift SDK 适用于在 macOS 和 iOS 应用中接入迅雷下载能�
 
 | 场景 | 文档 |
 | --- | --- |
-| macOS | [Examples/macOS](./Examples/macOS/) |
-| iOS | [Examples/iOS](./Examples/iOS/) |
+| macOS | [示例代码](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-swift/Examples/macOS) |
+| iOS | [示例代码](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-swift/Examples/iOS) |
 
 ## 安装
 
-下载 GitHub Release 压缩包：
+下载 [xunlei-dlsdk-swift-1.0.0.zip](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-swift-1.0.0.zip) 并解压：
 
 ```bash
-curl -L -o xunlei-dlsdk-swift-1.0.0.zip \
-  https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-swift-1.0.0.zip
 unzip xunlei-dlsdk-swift-1.0.0.zip
 ```
 
@@ -74,6 +72,9 @@ let initResult = sdk.initialize(
 guard initResult == XLDLSuccess || initResult == XLDLAlreadyInit else {
     fatalError("init failed: \(initResult)")
 }
+defer {
+    _ = sdk.uninit()
+}
 
 let token = try sdk.getLoginToken(apiKey: "your-api-key")
 let login = sdk.login(token: token.token)
@@ -86,9 +87,13 @@ let task = sdk.createP2SPTask(
     savePath: "/tmp/ThunderDownload",
     saveName: "file.zip"
 )
+guard task.result == XLDLSuccess else {
+    fatalError("create task failed: \(task.result)")
+}
 
-if task.result == XLDLSuccess {
-    _ = sdk.startTask(taskId: task.taskId)
+let startResult = sdk.startTask(taskId: task.taskId)
+guard startResult == XLDLSuccess else {
+    fatalError("start task failed: \(startResult)")
 }
 
 while true {
@@ -105,14 +110,13 @@ while true {
     }
     Thread.sleep(forTimeInterval: 1)
 }
-
-_ = sdk.uninit()
 ```
 
-完整示例见 `Examples/macOS` 和 `Examples/iOS`。
+完整示例见 [示例代码](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-swift/Examples)。
 
 ## 相关文档
 
+- [Github](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-swift)
 - [接入流程与凭证申请](https://open.xunlei.com/doc?doc=access_flow)
 - [API 参考文档](https://open.xunlei.com/doc?doc=xl_dl_init)
 - [错误码说明](https://open.xunlei.com/doc?doc=error_code)

@@ -17,17 +17,34 @@ Console.WriteLine($"version result:{version.Result} version:{version.Version}");
 
 int initResult = sdk.Initialize(AppId, AppVersion, configPath, saveTasks: true);
 Console.WriteLine($"init result:{initResult}");
+if (initResult != XLDownloadAPI.ErrorSuccess &&
+    initResult != XLDownloadAPI.ErrorAlreadyInit)
+{
+    throw new InvalidOperationException($"init failed: {initResult}");
+}
 
 var token = await sdk.GetLoginTokenAsync(ApiKey);
 var login = sdk.Login(token.Token);
 Console.WriteLine($"login result:{login.Result} session:{login.SessionId}");
+if (login.Result != XLDownloadAPI.ErrorSuccess)
+{
+    throw new InvalidOperationException($"login failed: {login.Result}");
+}
 
 string saveName = Path.GetFileName(new Uri(TaskUrl).LocalPath);
 var create = sdk.CreateP2spTask(TaskUrl, savePath, saveName);
 Console.WriteLine($"create task result:{create.Result} taskId:{create.TaskId}");
+if (create.Result != XLDownloadAPI.ErrorSuccess)
+{
+    throw new InvalidOperationException($"create task failed: {create.Result}");
+}
 
 int startResult = sdk.StartTask(create.TaskId);
 Console.WriteLine($"start task result:{startResult}");
+if (startResult != XLDownloadAPI.ErrorSuccess)
+{
+    throw new InvalidOperationException($"start task failed: {startResult}");
+}
 
 while (true)
 {
@@ -43,6 +60,3 @@ while (true)
 
     await Task.Delay(TimeSpan.FromSeconds(1));
 }
-
-int uninitResult = sdk.Uninit();
-Console.WriteLine($"uninit result:{uninitResult}");

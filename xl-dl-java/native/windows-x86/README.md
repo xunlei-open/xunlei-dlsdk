@@ -1,4 +1,4 @@
-# xl-dl-native-windows-x86
+# 迅雷下载 Java Windows x86 平台包指南
 
 这是 `xl-dl-desktop-1.0.0.jar` 的 Windows x86 平台动态库包。
 
