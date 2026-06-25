@@ -1,6 +1,6 @@
 {
   "name": "com.xunlei.open.dlsdk.native.macos-universal",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "XL Download SDK Native macOS Universal",
   "description": "XL Download Unity SDK 的 macOS universal 平台动态库包。",
   "unity": "2021.3",

@@ -1,6 +1,6 @@
 {
   "name": "com.xunlei.open.dlsdk.native.windows-x64",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "XL Download SDK Native Windows x64",
   "description": "XL Download Unity SDK 的 Windows x64 平台动态库包。",
   "unity": "2021.3",
