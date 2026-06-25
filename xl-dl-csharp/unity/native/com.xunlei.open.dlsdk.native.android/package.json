@@ -1,6 +1,6 @@
 {
   "name": "com.xunlei.open.dlsdk.native.android",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "XL Download SDK Native Android",
   "description": "XL Download Unity SDK 的 Android 平台动态库包，目前仅支持 arm64-v8a。",
   "unity": "2021.3",

@@ -2,6 +2,8 @@ name: SDK Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - "v*"
   workflow_dispatch:
@@ -9,7 +11,7 @@ on:
       version:
         description: "SDK version used in release artifact file names"
         required: true
-        default: "1.0.0"
+        default: "1.0.1"
 
 permissions:
   contents: write

@@ -14,22 +14,22 @@ XL Download Java Desktop SDK 适用于在 Windows、macOS 和 Linux 的 Java 桌
 
 ## 安装
 
-下载 [`xunlei-dlsdk-java-desktop-1.0.0.zip`](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-java-desktop-1.0.0.zip)，解压后把桌面主包和应用要支持的平台 native 包放入应用工程的 `libs/` 目录后引入：
+下载 [`xunlei-dlsdk-java-desktop-1.0.1.zip`](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-java-desktop-1.0.1.zip)，解压后把桌面主包和应用要支持的平台 native 包放入应用工程的 `libs/` 目录后引入：
 
 ```gradle
-implementation(files("libs/xl-dl-desktop-1.0.0.jar"))
-runtimeOnly(files("libs/xl-dl-native-windows-x64-1.0.0.jar"))
+implementation(files("libs/xl-dl-desktop-1.0.1.jar"))
+runtimeOnly(files("libs/xl-dl-native-windows-x64-1.0.1.jar"))
 ```
 
 压缩包内包含：
 
 | 目标平台 | JAR |
 | --- | --- |
-| 主包 | `xl-dl-desktop-1.0.0.jar` |
-| Windows x64 | `xl-dl-native-windows-x64-1.0.0.jar` |
-| Windows x86 | `xl-dl-native-windows-x86-1.0.0.jar` |
-| macOS Universal | `xl-dl-native-macos-universal-1.0.0.jar` |
-| Linux x64 | `xl-dl-native-linux-x64-1.0.0.jar` |
+| 主包 | `xl-dl-desktop-1.0.1.jar` |
+| Windows x64 | `xl-dl-native-windows-x64-1.0.1.jar` |
+| Windows x86 | `xl-dl-native-windows-x86-1.0.1.jar` |
+| macOS Universal | `xl-dl-native-macos-universal-1.0.1.jar` |
+| Linux x64 | `xl-dl-native-linux-x64-1.0.1.jar` |
 
 跨平台应用可以同时引入多个 native JAR。
 

@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.xunlei.open.examples'
-version = '1.0.0'
+version = '1.0.1'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -21,8 +21,8 @@ application {
 
 dependencies {
   implementation 'org.json:json:20231013'
-  implementation 'com.xunlei.open:xl-dl-desktop:1.0.0'
-  runtimeOnly "com.xunlei.open:xl-dl-native-${currentNativeArtifactSuffix()}:1.0.0"
+  implementation 'com.xunlei.open:xl-dl-desktop:1.0.1'
+  runtimeOnly "com.xunlei.open:xl-dl-native-${currentNativeArtifactSuffix()}:1.0.1"
 }
 
 String currentNativeArtifactSuffix() {

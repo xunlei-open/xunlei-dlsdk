@@ -2,10 +2,14 @@ name: SDK CI - Python
 
 on:
   push:
+    branches:
+      - main
     paths:
       - ".github/workflows/sdk-ci-python.yml"
       - "xl-dl-python/**"
   pull_request:
+    branches:
+      - main
     paths:
       - ".github/workflows/sdk-ci-python.yml"
       - "xl-dl-python/**"

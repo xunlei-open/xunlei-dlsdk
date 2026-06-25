@@ -13,8 +13,8 @@ Runtime/Plugins/Android/libs/arm64-v8a/libdk.so
 ```json
 {
   "dependencies": {
-    "com.xunlei.open.dlsdk": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity#v1.0.0",
-    "com.xunlei.open.dlsdk.native.android": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.android#v1.0.0"
+    "com.xunlei.open.dlsdk": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity#v1.0.1",
+    "com.xunlei.open.dlsdk.native.android": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.android#v1.0.1"
   }
 }
 ```
