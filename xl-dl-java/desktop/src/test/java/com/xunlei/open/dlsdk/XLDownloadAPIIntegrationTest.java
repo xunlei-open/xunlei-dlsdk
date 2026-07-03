@@ -79,9 +79,10 @@ public final class XLDownloadAPIIntegrationTest {
             }
 
             int setUrlAccelerationResult = XLDownloadAPI.setDownloadUrlAcceleration(true);
-            System.out.println("Download URL acceleration enabled result: " + setUrlAccelerationResult);
+            require(setUrlAccelerationResult == XLDownloadAPI.ERROR_SUCCESS, "set download url acceleration failed: " + setUrlAccelerationResult);
+            Thread.sleep(1000L);
             setUrlAccelerationResult = XLDownloadAPI.setDownloadUrlAcceleration(false);
-            System.out.println("Download URL acceleration disabled result: " + setUrlAccelerationResult);
+            require(setUrlAccelerationResult == XLDownloadAPI.ERROR_SUCCESS, "set download url acceleration failed: " + setUrlAccelerationResult);
 
             throw new RuntimeException("task " + taskId + " did not finish within " + timeoutSeconds + " seconds");
         } finally {
