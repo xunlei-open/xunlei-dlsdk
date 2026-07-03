@@ -177,6 +177,11 @@ namespace Xunlei.XlDl.Unity
                 : (result, string.Empty);
         }
 
+        public int SetDownloadUrlAcceleration(bool enable)
+        {
+            return xl_dl_set_external_setting("download", "url_acceleration", enable ? "true" : "false");
+        }
+
         public void Dispose()
         {
             Uninit();
@@ -244,6 +249,9 @@ namespace Xunlei.XlDl.Unity
 
         [DllImport(LibraryName)]
         private static extern int xl_dl_version(byte[] buffer, ref uint bufferLength);
+
+        [DllImport(LibraryName)]
+        private static extern int xl_dl_set_external_setting([MarshalAs(UnmanagedType.LPUTF8Str)] string domain, [MarshalAs(UnmanagedType.LPUTF8Str)] string key, [MarshalAs(UnmanagedType.LPUTF8Str)] string value);
     }
 
     public sealed class LoginTokenResult

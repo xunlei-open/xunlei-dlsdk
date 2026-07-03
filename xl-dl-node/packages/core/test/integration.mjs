@@ -81,6 +81,11 @@ async function main() {
       await sleep(1000);
     }
 
+    const setUrlAccelerationResult = sdk.setDownloadUrlAcceleration(true);
+    console.log(`Download URL acceleration enabled result: ${setUrlAccelerationResult}`);
+    const setUrlAccelerationResult2 = sdk.setDownloadUrlAcceleration(false);
+    console.log(`Download URL acceleration disabled result: ${setUrlAccelerationResult2}`);
+
     throw new Error(`task ${taskId} did not finish within ${timeoutSeconds} seconds`);
   } finally {
     try {

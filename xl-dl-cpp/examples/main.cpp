@@ -117,6 +117,11 @@ int main() {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
+    code = _xl_dl_set_download_url_acceleration(true);
+    std::printf("xl_dl_set_download_url_acceleration true result:%d\n", code);
+    code = _xl_dl_set_download_url_acceleration(false);
+    std::printf("xl_dl_set_download_url_acceleration false result:%d\n", code);
+
     int uninit_code = xl_dl_uninit();
     std::printf("xl_dl_uninit result:%d\n", uninit_code);
     return code == XL_DL_ERROR_SUCCESS || code == XL_DL_ERROR_ALREADY_INIT ? 0 : code;

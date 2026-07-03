@@ -1,6 +1,6 @@
 {
   "name": "com.xunlei.open.dlsdk.native.ios",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "displayName": "XL Download SDK Native iOS",
   "description": "XL Download Unity SDK 的 iOS arm64 平台动态库包。",
   "unity": "2021.3",

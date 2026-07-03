@@ -92,6 +92,12 @@ func main() throws {
         Thread.sleep(forTimeInterval: 1)
     }
 
+    let setResult = sdk.setDownloadUrlAcceleration(enable: true)
+    try require(setResult == errorSuccess, "set download url acceleration failed: \(setResult)")
+    Thread.sleep(forTimeInterval: 1)
+    let setResult2 = sdk.setDownloadUrlAcceleration(enable: false)
+    try require(setResult2 == errorSuccess, "set download url acceleration failed: \(setResult2)")
+
     throw NSError(domain: "XlDlSwiftIntegrationTest", code: 1, userInfo: [NSLocalizedDescriptionKey: "task \(taskId) did not finish within \(Int(timeoutSeconds)) seconds"])
 }
 

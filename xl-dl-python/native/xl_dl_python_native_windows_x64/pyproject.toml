@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xunlei-open-dlsdk-native-windows-x64"
-version = "1.0.1"
+version = "1.0.2"
 description = "XL Download Python SDK 的 Windows x64 平台动态库包"
 readme = "README.md"
 requires-python = ">=3.8"

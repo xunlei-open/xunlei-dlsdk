@@ -79,6 +79,11 @@ public sealed class BasicDownloadExample : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
 
+        int setUrlAccelerationResult = sdk.SetDownloadUrlAcceleration(true);
+        Debug.Log($"Download URL acceleration enabled result: {setUrlAccelerationResult}");
+        setUrlAccelerationResult = sdk.SetDownloadUrlAcceleration(false);
+        Debug.Log($"Download URL acceleration disabled result: {setUrlAccelerationResult}");
+
         int uninitResult = sdk.Uninit();
         Debug.Log($"uninit result:{uninitResult}");
     }

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Xunlei.Open.DlSdk.Native.osx-universal</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Xunlei</Authors>
     <Description>Xunlei.Open.DlSdk 的 macOS universal 平台动态库包。</Description>
     <IncludeBuildOutput>false</IncludeBuildOutput>

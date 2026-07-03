@@ -160,6 +160,14 @@ class XLDownloadAPI:
             task_token_err=state.task_token_err,
         )
 
+    def set_download_url_acceleration(self, enable: bool) -> int:
+        val_str = "true" if enable else "false"
+        return self._lib.xl_dl_set_external_setting(
+            "task".encode('utf-8'),
+            "query_by_3_cid_switch".encode('utf-8'),
+            val_str.encode('utf-8')
+        )
+
     def _bind(self):
         self._lib.xl_dl_init.argtypes = [ctypes.POINTER(_InitParam)]
         self._lib.xl_dl_init.restype = ctypes.c_int32
@@ -184,3 +192,5 @@ class XLDownloadAPI:
             ctypes.POINTER(_TaskState),
         ]
         self._lib.xl_dl_get_task_state.restype = ctypes.c_int32
+        self._lib.xl_dl_set_external_setting.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+        self._lib.xl_dl_set_external_setting.restype = ctypes.c_int32

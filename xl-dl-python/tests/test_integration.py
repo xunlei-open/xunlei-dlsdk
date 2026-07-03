@@ -77,6 +77,12 @@ class XLDownloadAPIIntegrationTest(unittest.TestCase):
                     return
                 self.assertNotEqual(state.state_code, TASK_STATUS_FAILED)
                 time.sleep(1)
+            
+            set_result = sdk.set_download_url_acceleration(True)
+            self.assertEqual(set_result, ERROR_SUCCESS)
+            time.sleep(1)
+            set_result = sdk.set_download_url_acceleration(False)
+            self.assertEqual(set_result, ERROR_SUCCESS)
 
             self.fail(f"task {task_id} did not finish within {timeout_seconds} seconds")
         finally:
