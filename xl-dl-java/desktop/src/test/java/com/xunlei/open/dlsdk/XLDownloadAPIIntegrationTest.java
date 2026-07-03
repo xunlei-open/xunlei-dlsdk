@@ -16,26 +16,25 @@ public final class XLDownloadAPIIntegrationTest {
 
     private static void downloadTest() throws Exception {
         XLDownloadAPI.CreateTaskResult create = XLDownloadAPI.createP2spTask(taskUrl, savePath.toString(), saveName(taskUrl));
-            int createResult = create.result;
-            require(createResult == XLDownloadAPI.ERROR_SUCCESS, "create task failed: " + createResult);
-            require(create.taskId > 0, "task id must be greater than zero");
-            taskId = create.taskId;
+        int createResult = create.result;
+        require(createResult == XLDownloadAPI.ERROR_SUCCESS, "create task failed: " + createResult);
+        require(create.taskId > 0, "task id must be greater than zero");
+        taskId = create.taskId;
 
-            int startResult = XLDownloadAPI.startTask(taskId);
-            require(startResult == XLDownloadAPI.ERROR_SUCCESS, "start task failed: " + startResult);
+        int startResult = XLDownloadAPI.startTask(taskId);
+        require(startResult == XLDownloadAPI.ERROR_SUCCESS, "start task failed: " + startResult);
 
-            long deadline = System.currentTimeMillis() + timeoutSeconds * 1000L;
-            while (System.currentTimeMillis() < deadline) {
-                XLDownloadAPI.TaskStateResult stateResult = XLDownloadAPI.getTaskState(taskId);
-                XLDownloadAPI.TaskState state = stateResult.state;
-                int stateResultCode = stateResult.result;
-                require(stateResultCode == XLDownloadAPI.ERROR_SUCCESS, "get task state failed: " + stateResultCode);
-                if (state.stateCode == XLDownloadAPI.TASK_STATUS_SUCCEEDED) {
-                    return;
-                }
-                require(state.stateCode != XLDownloadAPI.TASK_STATUS_FAILED, "task failed");
-                Thread.sleep(1000L);
+        long deadline = System.currentTimeMillis() + timeoutSeconds * 1000L;
+        while (System.currentTimeMillis() < deadline) {
+            XLDownloadAPI.TaskStateResult stateResult = XLDownloadAPI.getTaskState(taskId);
+            XLDownloadAPI.TaskState state = stateResult.state;
+            int stateResultCode = stateResult.result;
+            require(stateResultCode == XLDownloadAPI.ERROR_SUCCESS, "get task state failed: " + stateResultCode);
+            if (state.stateCode == XLDownloadAPI.TASK_STATUS_SUCCEEDED) {
+                return;
             }
+            require(state.stateCode != XLDownloadAPI.TASK_STATUS_FAILED, "task failed");
+            Thread.sleep(1000L);
         }
 
         throw new RuntimeException("task " + taskId + " did not finish within " + timeoutSeconds + " seconds");

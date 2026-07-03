@@ -28,10 +28,10 @@ bool ensure_dir(const char* path) {
 
 }  // namespace
 
-void download_test() {
+int download_test(const std::string& task_url, const std::string& save_name, const std::string& file_save_dir) {
     xl_dl_create_p2sp_info create_info;
     std::memset(&create_info, 0, sizeof(create_info));
-    create_info.save_path = FILE_SAVE_DIR.c_str();
+    create_info.save_path = file_save_dir.c_str();
     create_info.save_name = save_name.c_str();
     create_info.url = task_url.c_str();
 
@@ -39,14 +39,12 @@ void download_test() {
     auto code = xl_dl_create_p2sp_task(&create_info, &task_id);
     std::printf("xl_dl_create_p2sp_task result:%d task_id:%llu\n", code, static_cast<unsigned long long>(task_id));
     if (code != XL_DL_ERROR_SUCCESS) {
-        xl_dl_uninit();
         return code;
     }
 
     code = xl_dl_start_task(task_id);
     std::printf("xl_dl_start_task result:%d\n", code);
     if (code != XL_DL_ERROR_SUCCESS) {
-        xl_dl_uninit();
         return code;
     }
 
@@ -69,6 +67,7 @@ void download_test() {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
+    return code;
 }
 
 int main() {
@@ -120,11 +119,19 @@ int main() {
         return code;
     }
 
-    download_test();
+    code = download_test(task_url, save_name, FILE_SAVE_DIR);
+    if (code != XL_DL_ERROR_SUCCESS) {
+        xl_dl_uninit();
+        return code;
+    }
 
-    auto code = _xl_dl_set_download_url_acceleration(false);
+    code = _xl_dl_set_download_url_acceleration(false);
     std::printf("xl_dl_set_download_url_acceleration disable result:%d\n", code);
-    download_test();
+    code = download_test(task_url, save_name, FILE_SAVE_DIR);
+    if (code != XL_DL_ERROR_SUCCESS) {
+        xl_dl_uninit();
+        return code;
+    }
 
     int uninit_code = xl_dl_uninit();
     std::printf("xl_dl_uninit result:%d\n", uninit_code);
