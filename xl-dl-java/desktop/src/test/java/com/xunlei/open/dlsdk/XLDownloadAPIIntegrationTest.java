@@ -11,10 +11,11 @@ public final class XLDownloadAPIIntegrationTest {
     private static final String APP_VERSION = "1.0";
     private static final String DEFAULT_TASK_URL = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe";
     private static final long DEFAULT_TIMEOUT_SECONDS = 900L;
+    private static long taskId = 0L;
 
-    private XLDownloadAPIIntegrationTest(String savePath, String taskUrl, long timeoutSeconds) {}
+    private XLDownloadAPIIntegrationTest() {}
 
-    private static void downloadTest() throws Exception {
+    private static void downloadTest(String savePath, String taskUrl, long timeoutSeconds) throws Exception {
         XLDownloadAPI.CreateTaskResult create = XLDownloadAPI.createP2spTask(taskUrl, savePath.toString(), saveName(taskUrl));
         int createResult = create.result;
         require(createResult == XLDownloadAPI.ERROR_SUCCESS, "create task failed: " + createResult);
@@ -51,7 +52,6 @@ public final class XLDownloadAPIIntegrationTest {
 
         Path configPath = null;
         Path savePath = null;
-        long taskId = 0L;
         try {
             configPath = Files.createTempDirectory("xl-dl-java-cfg-");
             savePath = Files.createTempDirectory("xl-dl-java-downloads-");
@@ -81,13 +81,13 @@ public final class XLDownloadAPIIntegrationTest {
                 System.err.println("warning: get loginToken failed: " + error.getMessage() + ", continue without login");
             }
 
-            downloadTest();
+            downloadTest(savePath.toString(), taskUrl, timeoutSeconds);
             Thread.sleep(1000L);
 
             int setUrlAccelerationResult = XLDownloadAPI.setDownloadUrlAcceleration(false);
             require(setUrlAccelerationResult == XLDownloadAPI.ERROR_SUCCESS, "set download url acceleration failed: " + setUrlAccelerationResult);
 
-            downloadTest();
+            downloadTest(savePath.toString(), taskUrl, timeoutSeconds);
         } finally {
             try {
                 if (taskId != 0L) {
