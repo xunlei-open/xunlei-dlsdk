@@ -19,6 +19,30 @@ const DEFAULT_TIMEOUT_SECONDS = 900;
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+async function downloadTest(sdk, taskUrl, savePath, timeoutSeconds) {
+  const saveName = path.basename(new URL(taskUrl).pathname) || "download.tmp";
+  const create = sdk.createP2spTask({ url: taskUrl, savePath, saveName });
+  assert.equal(create.result, ERROR_SUCCESS, `create task failed: ${create.result}`);
+  assert.ok(create.taskId > 0n, "task id must be greater than zero");
+  taskId = create.taskId;
+
+  const startResult = sdk.startTask(taskId);
+  assert.equal(startResult, ERROR_SUCCESS, `start task failed: ${startResult}`);
+
+  const deadline = Date.now() + timeoutSeconds * 1000;
+  while (Date.now() < deadline) {
+    const state = sdk.getTaskState(taskId);
+    assert.equal(state.result, ERROR_SUCCESS, `get task state failed: ${state.result}`);
+    if (state.state.stateCode === TASK_STATUS_SUCCEEDED) {
+      return;
+    }
+    assert.notEqual(state.state.stateCode, TASK_STATUS_FAILED, "task failed");
+    await sleep(1000);
+  }
+
+  throw new Error(`task ${taskId} did not finish within ${timeoutSeconds} seconds`);
+}
+
 async function main() {
   const apiKey = process.env.API_KEY;
   assert.ok(apiKey, "API_KEY environment variable is required");
@@ -61,32 +85,12 @@ async function main() {
       console.warn(`warning: get loginToken failed: ${error?.message ?? error}, continue without login`);
     }
 
-    const saveName = path.basename(new URL(taskUrl).pathname) || "download.tmp";
-    const create = sdk.createP2spTask({ url: taskUrl, savePath, saveName });
-    assert.equal(create.result, ERROR_SUCCESS, `create task failed: ${create.result}`);
-    assert.ok(create.taskId > 0n, "task id must be greater than zero");
-    taskId = create.taskId;
 
-    const startResult = sdk.startTask(taskId);
-    assert.equal(startResult, ERROR_SUCCESS, `start task failed: ${startResult}`);
+    await downloadTest(sdk, taskUrl, savePath, timeoutSeconds);
 
-    const deadline = Date.now() + timeoutSeconds * 1000;
-    while (Date.now() < deadline) {
-      const state = sdk.getTaskState(taskId);
-      assert.equal(state.result, ERROR_SUCCESS, `get task state failed: ${state.result}`);
-      if (state.state.stateCode === TASK_STATUS_SUCCEEDED) {
-        return;
-      }
-      assert.notEqual(state.state.stateCode, TASK_STATUS_FAILED, "task failed");
-      await sleep(1000);
-    }
-
-    const setUrlAccelerationResult = sdk.setDownloadUrlAcceleration(true);
-    console.log(`Download URL acceleration enabled result: ${setUrlAccelerationResult}`);
-    const setUrlAccelerationResult2 = sdk.setDownloadUrlAcceleration(false);
-    console.log(`Download URL acceleration disabled result: ${setUrlAccelerationResult2}`);
-
-    throw new Error(`task ${taskId} did not finish within ${timeoutSeconds} seconds`);
+    const setUrlAccelerationResult = sdk.setDownloadUrlAcceleration(false);
+    assert.equal(setUrlAccelerationResult, ERROR_SUCCESS, `set download url acceleration failed: ${setUrlAccelerationResult}`);
+    await downloadTest(sdk, taskUrl, savePath, timeoutSeconds);
   } finally {
     try {
       if (taskId !== 0n && sdk) {

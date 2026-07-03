@@ -17,6 +17,37 @@ func env(_ name: String, default defaultValue: String = "") -> String {
     return value.isEmpty ? defaultValue : value
 }
 
+func downloadTest(sdk: XLDownloadAPI, taskURLString: String, saveURL: URL, timeoutSeconds: TimeInterval) throws {
+    let taskURL = URL(string: taskURLString)!
+    let create = sdk.createP2SPTask(
+        url: taskURL.absoluteString,
+        savePath: saveURL.path,
+        saveName: taskURL.lastPathComponent.isEmpty ? "download.tmp" : taskURL.lastPathComponent
+    )
+    try require(create.result == errorSuccess, "create task failed: \(create.result)")
+    try require(create.taskId > 0, "task id must be greater than zero")
+    let taskId = create.taskId
+
+    let startResult = sdk.startTask(taskId: taskId)
+    try require(startResult == errorSuccess, "start task failed: \(startResult)")
+
+    let deadline = Date().addingTimeInterval(timeoutSeconds)
+    while Date() < deadline {
+        let stateResult = sdk.getTaskState(taskId: taskId)
+        try require(stateResult.result == errorSuccess, "get task state failed: \(stateResult.result)")
+        guard let state = stateResult.state else {
+            throw NSError(domain: "XlDlSwiftIntegrationTest", code: 1, userInfo: [NSLocalizedDescriptionKey: "task state is empty"])
+        }
+        if state.stateCode == XLDownloadTaskStatusSucceeded {
+            return
+        }
+        try require(state.stateCode != XLDownloadTaskStatusFailed, "task failed")
+        Thread.sleep(forTimeInterval: 1)
+    }
+
+    throw NSError(domain: "XlDlSwiftIntegrationTest", code: 1, userInfo: [NSLocalizedDescriptionKey: "task \(taskId) did not finish within \(Int(timeoutSeconds)) seconds"])
+}
+
 func main() throws {
     let apiKey = env("API_KEY")
     try require(!apiKey.isEmpty, "API_KEY environment variable is required")
@@ -65,40 +96,12 @@ func main() throws {
         fputs("warning: get loginToken failed: \(error), continue without login\n", stderr)
     }
 
-    let taskURL = URL(string: taskURLString)!
-    let create = sdk.createP2SPTask(
-        url: taskURL.absoluteString,
-        savePath: saveURL.path,
-        saveName: taskURL.lastPathComponent.isEmpty ? "download.tmp" : taskURL.lastPathComponent
-    )
-    try require(create.result == errorSuccess, "create task failed: \(create.result)")
-    try require(create.taskId > 0, "task id must be greater than zero")
-    taskId = create.taskId
+    try downloadTest(sdk: sdk, taskURLString: taskURLString, saveURL: saveURL, timeoutSeconds: timeoutSeconds)
 
-    let startResult = sdk.startTask(taskId: taskId)
-    try require(startResult == errorSuccess, "start task failed: \(startResult)")
+    let setUrlAccelerationResult = sdk.setDownloadUrlAcceleration(enable: false)
+    try require(setUrlAccelerationResult == errorSuccess, "set download url acceleration failed: \(setUrlAccelerationResult)")
 
-    let deadline = Date().addingTimeInterval(timeoutSeconds)
-    while Date() < deadline {
-        let stateResult = sdk.getTaskState(taskId: taskId)
-        try require(stateResult.result == errorSuccess, "get task state failed: \(stateResult.result)")
-        guard let state = stateResult.state else {
-            throw NSError(domain: "XlDlSwiftIntegrationTest", code: 1, userInfo: [NSLocalizedDescriptionKey: "task state is empty"])
-        }
-        if state.stateCode == XLDownloadTaskStatusSucceeded {
-            return
-        }
-        try require(state.stateCode != XLDownloadTaskStatusFailed, "task failed")
-        Thread.sleep(forTimeInterval: 1)
-    }
-
-    let setResult = sdk.setDownloadUrlAcceleration(enable: true)
-    try require(setResult == errorSuccess, "set download url acceleration failed: \(setResult)")
-    Thread.sleep(forTimeInterval: 1)
-    let setResult2 = sdk.setDownloadUrlAcceleration(enable: false)
-    try require(setResult2 == errorSuccess, "set download url acceleration failed: \(setResult2)")
-
-    throw NSError(domain: "XlDlSwiftIntegrationTest", code: 1, userInfo: [NSLocalizedDescriptionKey: "task \(taskId) did not finish within \(Int(timeoutSeconds)) seconds"])
+    try downloadTest(sdk: sdk, taskURLString: taskURLString, saveURL: saveURL, timeoutSeconds: timeoutSeconds)
 }
 
 do {

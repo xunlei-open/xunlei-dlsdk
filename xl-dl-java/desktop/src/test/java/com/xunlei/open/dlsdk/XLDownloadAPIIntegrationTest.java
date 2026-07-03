@@ -12,7 +12,33 @@ public final class XLDownloadAPIIntegrationTest {
     private static final String DEFAULT_TASK_URL = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe";
     private static final long DEFAULT_TIMEOUT_SECONDS = 900L;
 
-    private XLDownloadAPIIntegrationTest() {
+    private XLDownloadAPIIntegrationTest(String savePath, String taskUrl, long timeoutSeconds) {}
+
+    private static void downloadTest() throws Exception {
+        XLDownloadAPI.CreateTaskResult create = XLDownloadAPI.createP2spTask(taskUrl, savePath.toString(), saveName(taskUrl));
+            int createResult = create.result;
+            require(createResult == XLDownloadAPI.ERROR_SUCCESS, "create task failed: " + createResult);
+            require(create.taskId > 0, "task id must be greater than zero");
+            taskId = create.taskId;
+
+            int startResult = XLDownloadAPI.startTask(taskId);
+            require(startResult == XLDownloadAPI.ERROR_SUCCESS, "start task failed: " + startResult);
+
+            long deadline = System.currentTimeMillis() + timeoutSeconds * 1000L;
+            while (System.currentTimeMillis() < deadline) {
+                XLDownloadAPI.TaskStateResult stateResult = XLDownloadAPI.getTaskState(taskId);
+                XLDownloadAPI.TaskState state = stateResult.state;
+                int stateResultCode = stateResult.result;
+                require(stateResultCode == XLDownloadAPI.ERROR_SUCCESS, "get task state failed: " + stateResultCode);
+                if (state.stateCode == XLDownloadAPI.TASK_STATUS_SUCCEEDED) {
+                    return;
+                }
+                require(state.stateCode != XLDownloadAPI.TASK_STATUS_FAILED, "task failed");
+                Thread.sleep(1000L);
+            }
+        }
+
+        throw new RuntimeException("task " + taskId + " did not finish within " + timeoutSeconds + " seconds");
     }
 
     public static void main(String[] args) throws Exception {
@@ -56,35 +82,13 @@ public final class XLDownloadAPIIntegrationTest {
                 System.err.println("warning: get loginToken failed: " + error.getMessage() + ", continue without login");
             }
 
-            XLDownloadAPI.CreateTaskResult create = XLDownloadAPI.createP2spTask(taskUrl, savePath.toString(), saveName(taskUrl));
-            int createResult = create.result;
-            require(createResult == XLDownloadAPI.ERROR_SUCCESS, "create task failed: " + createResult);
-            require(create.taskId > 0, "task id must be greater than zero");
-            taskId = create.taskId;
-
-            int startResult = XLDownloadAPI.startTask(taskId);
-            require(startResult == XLDownloadAPI.ERROR_SUCCESS, "start task failed: " + startResult);
-
-            long deadline = System.currentTimeMillis() + timeoutSeconds * 1000L;
-            while (System.currentTimeMillis() < deadline) {
-                XLDownloadAPI.TaskStateResult stateResult = XLDownloadAPI.getTaskState(taskId);
-                XLDownloadAPI.TaskState state = stateResult.state;
-                int stateResultCode = stateResult.result;
-                require(stateResultCode == XLDownloadAPI.ERROR_SUCCESS, "get task state failed: " + stateResultCode);
-                if (state.stateCode == XLDownloadAPI.TASK_STATUS_SUCCEEDED) {
-                    return;
-                }
-                require(state.stateCode != XLDownloadAPI.TASK_STATUS_FAILED, "task failed");
-                Thread.sleep(1000L);
-            }
-
-            int setUrlAccelerationResult = XLDownloadAPI.setDownloadUrlAcceleration(true);
-            require(setUrlAccelerationResult == XLDownloadAPI.ERROR_SUCCESS, "set download url acceleration failed: " + setUrlAccelerationResult);
+            downloadTest();
             Thread.sleep(1000L);
-            setUrlAccelerationResult = XLDownloadAPI.setDownloadUrlAcceleration(false);
+
+            int setUrlAccelerationResult = XLDownloadAPI.setDownloadUrlAcceleration(false);
             require(setUrlAccelerationResult == XLDownloadAPI.ERROR_SUCCESS, "set download url acceleration failed: " + setUrlAccelerationResult);
 
-            throw new RuntimeException("task " + taskId + " did not finish within " + timeoutSeconds + " seconds");
+            downloadTest();
         } finally {
             try {
                 if (taskId != 0L) {

@@ -22,6 +22,28 @@ DEFAULT_TIMEOUT_SECONDS = 900
 
 
 class XLDownloadAPIIntegrationTest(unittest.TestCase):
+    def download_test(self, sdk, task_url, save_path, timeout_seconds):
+        save_name = Path(urlparse(task_url).path).name or "download.tmp"
+        create_result, task_id = sdk.create_p2sp_task(task_url, str(save_path), save_name)
+        self.assertEqual(create_result, ERROR_SUCCESS)
+        self.assertGreater(task_id, 0)
+
+        start_result = sdk.start_task(task_id)
+        self.assertEqual(start_result, ERROR_SUCCESS)
+
+        deadline = time.monotonic() + timeout_seconds
+        while time.monotonic() < deadline:
+            state_result, state = sdk.get_task_state(task_id)
+            self.assertEqual(state_result, ERROR_SUCCESS)
+            self.assertIsNotNone(state)
+            if state.state_code == TASK_STATUS_SUCCEEDED:
+                return
+            self.assertNotEqual(state.state_code, TASK_STATUS_FAILED)
+            time.sleep(1)
+        
+        self.fail(f"task {task_id} did not finish within {timeout_seconds} seconds")
+
+
     def test_download_flow(self):
         api_key = os.environ.get("API_KEY")
         self.assertTrue(api_key, "API_KEY environment variable is required")
@@ -60,31 +82,13 @@ class XLDownloadAPIIntegrationTest(unittest.TestCase):
             except Exception as error:
                 print(f"warning: get loginToken failed: {error}, continue without login", file=sys.stderr)
 
-            save_name = Path(urlparse(task_url).path).name or "download.tmp"
-            create_result, task_id = sdk.create_p2sp_task(task_url, str(save_path), save_name)
-            self.assertEqual(create_result, ERROR_SUCCESS)
-            self.assertGreater(task_id, 0)
-
-            start_result = sdk.start_task(task_id)
-            self.assertEqual(start_result, ERROR_SUCCESS)
-
-            deadline = time.monotonic() + timeout_seconds
-            while time.monotonic() < deadline:
-                state_result, state = sdk.get_task_state(task_id)
-                self.assertEqual(state_result, ERROR_SUCCESS)
-                self.assertIsNotNone(state)
-                if state.state_code == TASK_STATUS_SUCCEEDED:
-                    return
-                self.assertNotEqual(state.state_code, TASK_STATUS_FAILED)
-                time.sleep(1)
             
-            set_result = sdk.set_download_url_acceleration(True)
-            self.assertEqual(set_result, ERROR_SUCCESS)
-            time.sleep(1)
+            self.download_test(sdk, task_url, save_path, timeout_seconds)
+
             set_result = sdk.set_download_url_acceleration(False)
             self.assertEqual(set_result, ERROR_SUCCESS)
 
-            self.fail(f"task {task_id} did not finish within {timeout_seconds} seconds")
+            self.download_test(sdk, task_url, save_path, timeout_seconds)
         finally:
             try:
                 if task_id and sdk is not None:

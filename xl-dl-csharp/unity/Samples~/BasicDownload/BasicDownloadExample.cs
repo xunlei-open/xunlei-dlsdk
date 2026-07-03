@@ -12,6 +12,41 @@ public sealed class BasicDownloadExample : MonoBehaviour
 
     private readonly XLDownloadAPI sdk = new XLDownloadAPI();
 
+    private void downloadTest(string savePath) {
+        string saveName = Path.GetFileName(new System.Uri(taskUrl).LocalPath);
+        var create = sdk.CreateP2spTask(taskUrl, savePath, saveName);
+        Debug.Log($"create task result:{create.Result} taskId:{create.TaskId}");
+        if (create.Result != XLDownloadAPI.ErrorSuccess)
+        {
+            sdk.Uninit();
+            yield break;
+        }
+
+        int startResult = sdk.StartTask(create.TaskId);
+        Debug.Log($"start task result:{startResult}");
+        if (startResult != XLDownloadAPI.ErrorSuccess)
+        {
+            sdk.Uninit();
+            yield break;
+        }
+
+        while (true)
+        {
+            var state = sdk.GetTaskState(create.TaskId);
+            Debug.Log($"task state result:{state.Result} state:{state.State.StateCode} downloaded:{state.State.DownloadedSize}/{state.State.TotalSize} speed:{state.State.Speed}");
+
+            if (state.Result != XLDownloadAPI.ErrorSuccess ||
+                state.State.StateCode == XLDownloadAPI.TaskStatusSucceeded ||
+                state.State.StateCode == XLDownloadAPI.TaskStatusFailed)
+            {
+                break;
+            }
+
+            yield return new WaitForSeconds(1);
+        }
+        
+    }
+
     private IEnumerator Start()
     {
         const string configPath = "/tmp/xl_dl_sdk_conf";
@@ -47,42 +82,12 @@ public sealed class BasicDownloadExample : MonoBehaviour
             yield break;
         }
 
-        string saveName = Path.GetFileName(new System.Uri(taskUrl).LocalPath);
-        var create = sdk.CreateP2spTask(taskUrl, savePath, saveName);
-        Debug.Log($"create task result:{create.Result} taskId:{create.TaskId}");
-        if (create.Result != XLDownloadAPI.ErrorSuccess)
-        {
-            sdk.Uninit();
-            yield break;
-        }
+        downloadTest(savePath);
 
-        int startResult = sdk.StartTask(create.TaskId);
-        Debug.Log($"start task result:{startResult}");
-        if (startResult != XLDownloadAPI.ErrorSuccess)
-        {
-            sdk.Uninit();
-            yield break;
-        }
-
-        while (true)
-        {
-            var state = sdk.GetTaskState(create.TaskId);
-            Debug.Log($"task state result:{state.Result} state:{state.State.StateCode} downloaded:{state.State.DownloadedSize}/{state.State.TotalSize} speed:{state.State.Speed}");
-
-            if (state.Result != XLDownloadAPI.ErrorSuccess ||
-                state.State.StateCode == XLDownloadAPI.TaskStatusSucceeded ||
-                state.State.StateCode == XLDownloadAPI.TaskStatusFailed)
-            {
-                break;
-            }
-
-            yield return new WaitForSeconds(1);
-        }
-
-        int setUrlAccelerationResult = sdk.SetDownloadUrlAcceleration(true);
-        Debug.Log($"Download URL acceleration enabled result: {setUrlAccelerationResult}");
         setUrlAccelerationResult = sdk.SetDownloadUrlAcceleration(false);
         Debug.Log($"Download URL acceleration disabled result: {setUrlAccelerationResult}");
+
+        downloadTest(savePath);
 
         int uninitResult = sdk.Uninit();
         Debug.Log($"uninit result:{uninitResult}");
