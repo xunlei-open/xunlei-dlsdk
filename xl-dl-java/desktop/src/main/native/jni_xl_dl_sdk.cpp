@@ -234,7 +234,7 @@ JNIEXPORT jint JNICALL Java_com_xunlei_open_dlsdk_XLDownloadAPI_version(JNIEnv *
 }
 
 JNIEXPORT jint JNICALL Java_com_xunlei_open_dlsdk_XLDownloadAPI_setDownloadUrlAcceleration(JNIEnv *env, jclass clazz, jboolean enable) {
-    return xl_dl_set_external_setting("task", "query_by_3_cid_switch", enable == JNI_TRUE ? "true" : "false");
+    return xl_dl_set_download_url_acceleration(enable == JNI_TRUE);
 }
 
 }

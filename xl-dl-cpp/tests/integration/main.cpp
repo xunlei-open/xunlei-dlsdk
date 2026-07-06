@@ -53,6 +53,41 @@ std::string save_name_from_url(const std::string& url) {
     return name.empty() ? "download.tmp" : name;
 }
 
+void download_test(const std::string& task_url, const std::string& save_dir_string, int32_t timeout_seconds, uint64_t* task_id_ptr) {
+    std::string save_name = save_name_from_url(task_url);
+    xl_dl_create_p2sp_info create_info;
+    std::memset(&create_info, 0, sizeof(create_info));
+    create_info.save_path = save_dir_string.c_str();
+    create_info.save_name = save_name.c_str();
+    create_info.url = task_url.c_str();
+
+    int32_t code = xl_dl_create_p2sp_task(&create_info, task_id_ptr);
+    auto task_id = *task_id_ptr;
+    require(code == XL_DL_ERROR_SUCCESS, "create task failed: " + std::to_string(code));
+    require(task_id > 0, "task id must be greater than zero");
+
+    code = xl_dl_start_task(task_id);
+    require(code == XL_DL_ERROR_SUCCESS, "start task failed: " + std::to_string(code));
+
+    std::chrono::steady_clock::time_point deadline =
+            std::chrono::steady_clock::now() + std::chrono::seconds(timeout_seconds);
+    while (std::chrono::steady_clock::now() < deadline) {
+        xl_dl_task_state state;
+        std::memset(&state, 0, sizeof(state));
+        code = xl_dl_get_task_state(task_id, &state);
+        require(code == XL_DL_ERROR_SUCCESS, "get task state failed: " + std::to_string(code));
+        if (state.state_code == XL_DL_TASK_STATUS_SUCCEEDED) {
+            xl_dl_delete_task(task_id, 1);
+            return;
+        }
+        require(state.state_code != XL_DL_TASK_STATUS_FAILED, "task failed");
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+    throw std::runtime_error("task " + std::to_string(task_id)
+            + " did not finish within " + std::to_string(timeout_seconds) + " seconds");
+}
+
 }  // namespace
 
 int main() {
@@ -109,40 +144,20 @@ int main() {
             std::fprintf(stderr, "warning: get loginToken failed: %s, continue without login\n", error.what());
         }
 
-        std::string save_name = save_name_from_url(task_url);
-        xl_dl_create_p2sp_info create_info;
-        std::memset(&create_info, 0, sizeof(create_info));
-        create_info.save_path = save_dir_string.c_str();
-        create_info.save_name = save_name.c_str();
-        create_info.url = task_url.c_str();
+        download_test(task_url, save_dir_string, timeout_seconds, &task_id);
+        remove_temp_dir(config_dir);
+        remove_temp_dir(save_dir);
 
-        code = xl_dl_create_p2sp_task(&create_info, &task_id);
-        require(code == XL_DL_ERROR_SUCCESS, "create task failed: " + std::to_string(code));
-        require(task_id > 0, "task id must be greater than zero");
+        code = xl_dl_set_download_url_acceleration(false);
+        require(code == XL_DL_ERROR_SUCCESS, "set download url acceleration failed: " + std::to_string(code));
 
-        code = xl_dl_start_task(task_id);
-        require(code == XL_DL_ERROR_SUCCESS, "start task failed: " + std::to_string(code));
+        download_test(task_url, save_dir_string, timeout_seconds, &task_id);
 
-        std::chrono::steady_clock::time_point deadline =
-                std::chrono::steady_clock::now() + std::chrono::seconds(timeout_seconds);
-        while (std::chrono::steady_clock::now() < deadline) {
-            xl_dl_task_state state;
-            std::memset(&state, 0, sizeof(state));
-            code = xl_dl_get_task_state(task_id, &state);
-            require(code == XL_DL_ERROR_SUCCESS, "get task state failed: " + std::to_string(code));
-            if (state.state_code == XL_DL_TASK_STATUS_SUCCEEDED) {
-                xl_dl_delete_task(task_id, 1);
-                xl_dl_uninit();
-                remove_temp_dir(config_dir);
-                remove_temp_dir(save_dir);
-                return 0;
-            }
-            require(state.state_code != XL_DL_TASK_STATUS_FAILED, "task failed");
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
+        xl_dl_uninit();
+        remove_temp_dir(config_dir);
+        remove_temp_dir(save_dir);
 
-        throw std::runtime_error("task " + std::to_string(task_id)
-                + " did not finish within " + std::to_string(timeout_seconds) + " seconds");
+        return 0;
     } catch (const std::exception& error) {
         std::fprintf(stderr, "%s\n", error.what());
         if (task_id != 0) {

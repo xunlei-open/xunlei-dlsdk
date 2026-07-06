@@ -176,14 +176,6 @@ public final class XLDownloadAPI {
     }
 
     public func setDownloadUrlAcceleration(enable: Bool) -> Int32 {
-        let valueStr = enable ? "true" : "false"
-    
-        return "task".withCString { cDomain in
-            "query_by_3_cid_switch".withCString { cKey in
-                valueStr.withCString { cValue in
-                    return xl_dl_set_external_setting(cDomain, cKey, cValue)
-                }
-            }
-        }
+        return xl_dl_set_download_url_acceleration(enable)
     }
 }

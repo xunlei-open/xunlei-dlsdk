@@ -184,10 +184,6 @@ XL_API(int32_t) xl_dl_set_http_header(uint64_t task_id, const char* header_name,
 
 XL_API(int32_t) xl_dl_version(char* buff, uint32_t* buff_len);
 
-XL_API(int32_t) xl_dl_set_external_setting(const char* domain, const char* key, const char* value);
-
-inline int32_t _xl_dl_set_download_url_acceleration(bool enable) {
-    return xl_dl_set_external_setting("task", "query_by_3_cid_switch", enable ? "true" : "false");
-}
+XL_API(int32_t) xl_dl_set_download_url_acceleration(bool enable);
 
 #endif
