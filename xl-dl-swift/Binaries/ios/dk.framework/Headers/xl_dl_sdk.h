@@ -1,6 +1,7 @@
 #ifndef XL_89F92728_5CF9_4DFD_AF25_C208E71C5E9C
 #define XL_89F92728_5CF9_4DFD_AF25_C208E71C5E9C
 #include <stdint.h>
+#include <stdbool.h>
 #ifdef WIN32
 #ifdef XL_SDK_EXPORTS
 #ifdef __cplusplus
