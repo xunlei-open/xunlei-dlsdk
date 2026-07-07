@@ -88,8 +88,8 @@ async function main() {
 
     await downloadTest(sdk, taskUrl, savePath, timeoutSeconds);
 
-    const setUrlAccelerationResult = sdk.setDownloadUrlAcceleration(false);
-    assert.equal(setUrlAccelerationResult, ERROR_SUCCESS, `set download url acceleration failed: ${setUrlAccelerationResult}`);
+    const setAccelerationResult = sdk.setDynamicLinkAcceleration(false);
+    assert.equal(setAccelerationResult, ERROR_SUCCESS, `set dynamic link acceleration failed: ${setAccelerationResult}`);
     await downloadTest(sdk, taskUrl, savePath, timeoutSeconds);
   } finally {
     try {

@@ -98,8 +98,8 @@ func main() throws {
 
     try downloadTest(sdk: sdk, taskURLString: taskURLString, saveURL: saveURL, timeoutSeconds: timeoutSeconds)
 
-    let setUrlAccelerationResult = sdk.setDownloadUrlAcceleration(enable: false)
-    try require(setUrlAccelerationResult == errorSuccess, "set download url acceleration failed: \(setUrlAccelerationResult)")
+    let setAccelerationResult = sdk.setDynamicLinkAcceleration(enable: false)
+    try require(setAccelerationResult == errorSuccess, "set dynamic link acceleration failed: \(setAccelerationResult)")
 
     try downloadTest(sdk: sdk, taskURLString: taskURLString, saveURL: saveURL, timeoutSeconds: timeoutSeconds)
 }

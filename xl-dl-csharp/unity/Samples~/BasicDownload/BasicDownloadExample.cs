@@ -84,8 +84,8 @@ public sealed class BasicDownloadExample : MonoBehaviour
 
         downloadTest(savePath);
 
-        setUrlAccelerationResult = sdk.SetDownloadUrlAcceleration(false);
-        Debug.Log($"Download URL acceleration disabled result: {setUrlAccelerationResult}");
+        int setAccelerationresult = sdk.SetDynamicLinkAcceleration(false);
+        Debug.Log($"Dynamic link acceleration disabled result: {setAccelerationresult}");
 
         downloadTest(savePath);
 

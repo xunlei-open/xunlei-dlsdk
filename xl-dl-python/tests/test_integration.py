@@ -85,7 +85,7 @@ class XLDownloadAPIIntegrationTest(unittest.TestCase):
             
             self.download_test(sdk, task_url, save_path, timeout_seconds)
 
-            set_result = sdk.set_download_url_acceleration(False)
+            set_result = sdk.set_dynamic_link_acceleration(False)
             self.assertEqual(set_result, ERROR_SUCCESS)
 
             self.download_test(sdk, task_url, save_path, timeout_seconds)

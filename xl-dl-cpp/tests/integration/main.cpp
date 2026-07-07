@@ -148,8 +148,8 @@ int main() {
         remove_temp_dir(config_dir);
         remove_temp_dir(save_dir);
 
-        code = xl_dl_set_download_url_acceleration(false);
-        require(code == XL_DL_ERROR_SUCCESS, "set download url acceleration failed: " + std::to_string(code));
+        code = xl_dl_set_dynamic_link_acceleration(false);
+        require(code == XL_DL_ERROR_SUCCESS, "set dynamic link acceleration failed: " + std::to_string(code));
 
         download_test(task_url, save_dir_string, timeout_seconds, &task_id);
 

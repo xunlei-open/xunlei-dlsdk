@@ -23,6 +23,6 @@ JNIEXPORT jint JNICALL Java_com_xunlei_open_dlsdk_XLDownloadAPI_setDownloadSpeed
 JNIEXPORT jint JNICALL Java_com_xunlei_open_dlsdk_XLDownloadAPI_setUploadSwitch(JNIEnv *env, jclass clazz, jint uploadSwitch);
 JNIEXPORT jint JNICALL Java_com_xunlei_open_dlsdk_XLDownloadAPI_setUploadSpeedLimit(JNIEnv *env, jclass clazz, jint speed);
 JNIEXPORT jint JNICALL Java_com_xunlei_open_dlsdk_XLDownloadAPI_version(JNIEnv *env, jclass clazz, jobject versionGetter);
-JNIEXPORT jint JNICALL Java_com_xunlei_open_dlsdk_XLDownloadAPI_setDownloadUrlAcceleration(JNIEnv *env, jclass clazz, jboolean enable);
+JNIEXPORT jint JNICALL Java_com_xunlei_open_dlsdk_XLDownloadAPI_setDynamicLinkAcceleration(JNIEnv *env, jclass clazz, jboolean enable);
 
 }

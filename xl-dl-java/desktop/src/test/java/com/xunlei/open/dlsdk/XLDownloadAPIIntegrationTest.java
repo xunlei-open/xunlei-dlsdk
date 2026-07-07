@@ -84,8 +84,8 @@ public final class XLDownloadAPIIntegrationTest {
             downloadTest(savePath.toString(), taskUrl, timeoutSeconds);
             Thread.sleep(1000L);
 
-            int setUrlAccelerationResult = XLDownloadAPI.setDownloadUrlAcceleration(false);
-            require(setUrlAccelerationResult == XLDownloadAPI.ERROR_SUCCESS, "set download url acceleration failed: " + setUrlAccelerationResult);
+            int setAccelerationResult = XLDownloadAPI.setDynamicLinkAcceleration(false);
+            require(setAccelerationResult == XLDownloadAPI.ERROR_SUCCESS, "set dynamic link acceleration failed: " + setAccelerationResult);
 
             downloadTest(savePath.toString(), taskUrl, timeoutSeconds);
         } finally {

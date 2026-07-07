@@ -233,8 +233,8 @@ JNIEXPORT jint JNICALL Java_com_xunlei_open_dlsdk_XLDownloadAPI_version(JNIEnv *
     return result;
 }
 
-JNIEXPORT jint JNICALL Java_com_xunlei_open_dlsdk_XLDownloadAPI_setDownloadUrlAcceleration(JNIEnv *env, jclass clazz, jboolean enable) {
-    return xl_dl_set_download_url_acceleration(enable == JNI_TRUE);
+JNIEXPORT jint JNICALL Java_com_xunlei_open_dlsdk_XLDownloadAPI_setDynamicLinkAcceleration(JNIEnv *env, jclass clazz, jboolean enable) {
+    return xl_dl_set_dynamic_link_acceleration(enable == JNI_TRUE);
 }
 
 }

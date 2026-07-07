@@ -126,7 +126,7 @@ public class XLDownloadAPI {
 
     private static native int version(StringGetter versionGetter);
 
-    public static native int setDownloadUrlAcceleration(boolean enable);
+    public static native int setDynamicLinkAcceleration(boolean enable);
 
     public static int init(String appId, String appVersion, String cfgPath, boolean saveTasks) {
         InitParam param = new InitParam();

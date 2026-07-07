@@ -175,7 +175,7 @@ public final class XLDownloadAPI {
         ))
     }
 
-    public func setDownloadUrlAcceleration(enable: Bool) -> Int32 {
-        return xl_dl_set_download_url_acceleration(enable)
+    public func setDynamicLinkAcceleration(enable: Bool) -> Int32 {
+        return xl_dl_set_dynamic_link_acceleration(enable)
     }
 }

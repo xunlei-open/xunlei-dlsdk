@@ -160,8 +160,8 @@ class XLDownloadAPI:
             task_token_err=state.task_token_err,
         )
 
-    def set_download_url_acceleration(self, enable: bool) -> int:
-        return self._lib.xl_dl_set_download_url_acceleration(enable)
+    def set_dynamic_link_acceleration(self, enable: bool) -> int:
+        return self._lib.xl_dl_set_dynamic_link_acceleration(enable)
 
     def _bind(self):
         self._lib.xl_dl_init.argtypes = [ctypes.POINTER(_InitParam)]
@@ -187,5 +187,5 @@ class XLDownloadAPI:
             ctypes.POINTER(_TaskState),
         ]
         self._lib.xl_dl_get_task_state.restype = ctypes.c_int32
-        self._lib.xl_dl_set_download_url_acceleration.argtypes = [ctypes.c_bool]
-        self._lib.xl_dl_set_download_url_acceleration.restype = ctypes.c_int32
+        self._lib.xl_dl_set_dynamic_link_acceleration.argtypes = [ctypes.c_bool]
+        self._lib.xl_dl_set_dynamic_link_acceleration.restype = ctypes.c_int32

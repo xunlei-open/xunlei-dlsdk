@@ -185,6 +185,6 @@ XL_API(int32_t) xl_dl_set_http_header(uint64_t task_id, const char* header_name,
 
 XL_API(int32_t) xl_dl_version(char* buff, uint32_t* buff_len);
 
-XL_API(int32_t) xl_dl_set_download_url_acceleration(bool enable);
+XL_API(int32_t) xl_dl_set_dynamic_link_acceleration(bool enable);
 
 #endif
