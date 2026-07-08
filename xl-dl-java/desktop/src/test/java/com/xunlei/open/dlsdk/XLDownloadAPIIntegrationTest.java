@@ -11,8 +11,34 @@ public final class XLDownloadAPIIntegrationTest {
     private static final String APP_VERSION = "1.0";
     private static final String DEFAULT_TASK_URL = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe";
     private static final long DEFAULT_TIMEOUT_SECONDS = 900L;
+    private static long taskId = 0L;
 
-    private XLDownloadAPIIntegrationTest() {
+    private XLDownloadAPIIntegrationTest() {}
+
+    private static void downloadTest(String savePath, String taskUrl, long timeoutSeconds) throws Exception {
+        XLDownloadAPI.CreateTaskResult create = XLDownloadAPI.createP2spTask(taskUrl, savePath.toString(), saveName(taskUrl));
+        int createResult = create.result;
+        require(createResult == XLDownloadAPI.ERROR_SUCCESS, "create task failed: " + createResult);
+        require(create.taskId > 0, "task id must be greater than zero");
+        taskId = create.taskId;
+
+        int startResult = XLDownloadAPI.startTask(taskId);
+        require(startResult == XLDownloadAPI.ERROR_SUCCESS, "start task failed: " + startResult);
+
+        long deadline = System.currentTimeMillis() + timeoutSeconds * 1000L;
+        while (System.currentTimeMillis() < deadline) {
+            XLDownloadAPI.TaskStateResult stateResult = XLDownloadAPI.getTaskState(taskId);
+            XLDownloadAPI.TaskState state = stateResult.state;
+            int stateResultCode = stateResult.result;
+            require(stateResultCode == XLDownloadAPI.ERROR_SUCCESS, "get task state failed: " + stateResultCode);
+            if (state.stateCode == XLDownloadAPI.TASK_STATUS_SUCCEEDED) {
+                return;
+            }
+            require(state.stateCode != XLDownloadAPI.TASK_STATUS_FAILED, "task failed");
+            Thread.sleep(1000L);
+        }
+
+        throw new RuntimeException("task " + taskId + " did not finish within " + timeoutSeconds + " seconds");
     }
 
     public static void main(String[] args) throws Exception {
@@ -26,7 +52,6 @@ public final class XLDownloadAPIIntegrationTest {
 
         Path configPath = null;
         Path savePath = null;
-        long taskId = 0L;
         try {
             configPath = Files.createTempDirectory("xl-dl-java-cfg-");
             savePath = Files.createTempDirectory("xl-dl-java-downloads-");
@@ -56,29 +81,13 @@ public final class XLDownloadAPIIntegrationTest {
                 System.err.println("warning: get loginToken failed: " + error.getMessage() + ", continue without login");
             }
 
-            XLDownloadAPI.CreateTaskResult create = XLDownloadAPI.createP2spTask(taskUrl, savePath.toString(), saveName(taskUrl));
-            int createResult = create.result;
-            require(createResult == XLDownloadAPI.ERROR_SUCCESS, "create task failed: " + createResult);
-            require(create.taskId > 0, "task id must be greater than zero");
-            taskId = create.taskId;
+            downloadTest(savePath.toString(), taskUrl, timeoutSeconds);
+            Thread.sleep(1000L);
 
-            int startResult = XLDownloadAPI.startTask(taskId);
-            require(startResult == XLDownloadAPI.ERROR_SUCCESS, "start task failed: " + startResult);
+            int setAccelerationResult = XLDownloadAPI.setDynamicLinkAcceleration(false);
+            require(setAccelerationResult == XLDownloadAPI.ERROR_SUCCESS, "set dynamic link acceleration failed: " + setAccelerationResult);
 
-            long deadline = System.currentTimeMillis() + timeoutSeconds * 1000L;
-            while (System.currentTimeMillis() < deadline) {
-                XLDownloadAPI.TaskStateResult stateResult = XLDownloadAPI.getTaskState(taskId);
-                XLDownloadAPI.TaskState state = stateResult.state;
-                int stateResultCode = stateResult.result;
-                require(stateResultCode == XLDownloadAPI.ERROR_SUCCESS, "get task state failed: " + stateResultCode);
-                if (state.stateCode == XLDownloadAPI.TASK_STATUS_SUCCEEDED) {
-                    return;
-                }
-                require(state.stateCode != XLDownloadAPI.TASK_STATUS_FAILED, "task failed");
-                Thread.sleep(1000L);
-            }
-
-            throw new RuntimeException("task " + taskId + " did not finish within " + timeoutSeconds + " seconds");
+            downloadTest(savePath.toString(), taskUrl, timeoutSeconds);
         } finally {
             try {
                 if (taskId != 0L) {

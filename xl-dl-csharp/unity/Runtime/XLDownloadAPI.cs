@@ -177,6 +177,11 @@ namespace Xunlei.XlDl.Unity
                 : (result, string.Empty);
         }
 
+        public int SetDynamicLinkAcceleration(bool enable)
+        {
+            return xl_dl_set_dynamic_link_acceleration(enable);
+        }
+
         public void Dispose()
         {
             Uninit();
@@ -244,6 +249,9 @@ namespace Xunlei.XlDl.Unity
 
         [DllImport(LibraryName)]
         private static extern int xl_dl_version(byte[] buffer, ref uint bufferLength);
+
+        [DllImport(LibraryName)]
+        private static extern int xl_dl_set_dynamic_link_acceleration(bool enable);
     }
 
     public sealed class LoginTokenResult

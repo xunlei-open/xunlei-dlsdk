@@ -41,6 +41,7 @@ type NativeBinding = {
   xl_dl_delete_task: (taskId: bigint, deleteFile: number) => number;
   xl_dl_get_task_state: (taskId: bigint, state: Record<string, unknown>) => number;
   xl_dl_version: (buffer: Buffer | null, bufferLength: number[]) => number;
+  xl_dl_set_dynamic_link_acceleration: (enable: boolean) => number;
 };
 
 let nativeTypesDeclared = false;
@@ -64,7 +65,8 @@ export class XLDownloadAPI {
       xl_dl_stop_task: library.func("int32_t xl_dl_stop_task(uint64_t task_id)"),
       xl_dl_delete_task: library.func("int32_t xl_dl_delete_task(uint64_t task_id, uint8_t delete_file)"),
       xl_dl_get_task_state: library.func("int32_t xl_dl_get_task_state(uint64_t task_id, _Out_ xl_dl_task_state *state)"),
-      xl_dl_version: library.func("int32_t xl_dl_version(void *buff, _Inout_ uint32_t *buff_len)")
+      xl_dl_version: library.func("int32_t xl_dl_version(void *buff, _Inout_ uint32_t *buff_len)"),
+      xl_dl_set_dynamic_link_acceleration: library.func("int32_t xl_dl_set_dynamic_link_acceleration(bool enable)")
     };
   }
 
@@ -152,6 +154,10 @@ export class XLDownloadAPI {
       result,
       version: result === ERROR_SUCCESS ? readNullTerminatedUtf8(buffer) : ""
     };
+  }
+
+  setDynamicLinkAcceleration(enable: boolean): number {
+    return this.native.xl_dl_set_dynamic_link_acceleration(enable);
   }
 }
 

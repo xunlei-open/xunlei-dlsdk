@@ -24,8 +24,8 @@ import com.xunlei.open.dlsdk.XLDownloadAPI;
 
 | 场景 | 文档 | 安装产物 |
 | --- | --- | --- |
-| Java Desktop | [desktop](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-java/desktop) | [xunlei-dlsdk-java-desktop-1.0.1.zip](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-java-desktop-1.0.1.zip) 中的 `xl-dl-desktop-1.0.1.jar` + 按需选择的平台 native JAR |
-| Java Android | [android](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-java/android) | [xunlei-dlsdk-java-android-1.0.1.aar](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-java-android-1.0.1.aar) |
+| Java Desktop | [desktop](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-java/desktop) | [xunlei-dlsdk-java-desktop-1.0.2.zip](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-java-desktop-1.0.2.zip) 中的 `xl-dl-desktop-1.0.2.jar` + 按需选择的平台 native JAR |
+| Java Android | [android](https://github.com/xunlei-open/xunlei-dlsdk/tree/main/xl-dl-java/android) | [xunlei-dlsdk-java-android-1.0.2.aar](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-java-android-1.0.2.aar) |
 
 ## 相关文档
 
