@@ -1,6 +1,6 @@
 {
   "name": "com.xunlei.open.dlsdk",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "displayName": "XL Download SDK",
   "description": "迅雷 XL Download Unity SDK。",
   "unity": "2021.3",

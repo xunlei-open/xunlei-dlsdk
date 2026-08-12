@@ -4,7 +4,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import android.os.Build;
+import android.os.Environment;
 import android.webkit.URLUtil;
 
 import androidx.annotation.NonNull;
@@ -14,8 +14,8 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.xunlei.open.dlsdk.XLDownloadAPI;
 
+import java.io.File;
 import java.util.List;
-import java.util.Objects;
 
 public class DownloadViewModel extends AndroidViewModel {
     private final DownloadRepository repository;
@@ -80,8 +80,12 @@ public class DownloadViewModel extends AndroidViewModel {
     public void addDownloadTask(String url) {
         // 在后台线程执行下载任务创建
         new Thread(() -> {
+            File downloadDir = getApplication().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+            if (downloadDir == null) {
+                downloadDir = getApplication().getFilesDir();
+            }
             String saveName = URLUtil.guessFileName(url, null, null);
-            int result = repository.addDownloadTask(url, "/tmp/ThunderDownload", saveName);
+            int result = repository.addDownloadTask(url, downloadDir.getAbsolutePath(), saveName);
             operationResult.postValue(result);
         }).start();
     }

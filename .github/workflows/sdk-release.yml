@@ -207,11 +207,32 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - name: Install Android NDK
+        shell: bash
+        run: |
+          sdkmanager --install "ndk;27.0.12077973" "cmake;3.22.1"
+          yes | sdkmanager --licenses >/dev/null || true
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x gradlew
         shell: bash
       - run: ./gradlew :android:assembleRelease
         shell: bash
+      - name: Verify AAR native libraries
+        shell: bash
+        run: |
+          set -euo pipefail
+          aar="android/build/outputs/aar/android-release.aar"
+          unzip -l "$aar" | grep -E 'jni/arm64-v8a/libdk\.so$'
+          unzip -l "$aar" | grep -E 'jni/arm64-v8a/libjni_dk\.so$'
+          tmp="$(mktemp -d)"
+          unzip -qo "$aar" "jni/arm64-v8a/libjni_dk.so" -d "$tmp"
+          if command -v llvm-nm >/dev/null 2>&1; then
+            nm_bin=llvm-nm
+          else
+            nm_bin=nm
+          fi
+          "$nm_bin" -D "$tmp/jni/arm64-v8a/libjni_dk.so" | grep -E 'Java_com_xunlei_open_dlsdk_XLDownloadAPI_init$'
       - name: Rename Android AAR
         shell: bash
         run: |

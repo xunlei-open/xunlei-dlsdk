@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(xl_dl_desktop_jni)
+project(xl_dl_jni)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

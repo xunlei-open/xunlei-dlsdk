@@ -1,6 +1,6 @@
 {
   "name": "@xunlei-open/dlsdk",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "迅雷 XL Download Node SDK。",
   "main": "dist/index.cjs",
   "types": "dist/index.d.ts",
@@ -17,10 +17,10 @@
     "koffi": "^2.11.0"
   },
   "optionalDependencies": {
-    "@xunlei-open/dlsdk-native-windows-x64": "1.0.2",
-    "@xunlei-open/dlsdk-native-windows-x86": "1.0.2",
-    "@xunlei-open/dlsdk-native-macos-universal": "1.0.2",
-    "@xunlei-open/dlsdk-native-linux-x64": "1.0.2"
+    "@xunlei-open/dlsdk-native-windows-x64": "1.0.3",
+    "@xunlei-open/dlsdk-native-windows-x86": "1.0.3",
+    "@xunlei-open/dlsdk-native-macos-universal": "1.0.3",
+    "@xunlei-open/dlsdk-native-linux-x64": "1.0.3"
   },
   "devDependencies": {
     "@rspack/cli": "^1.5.0",

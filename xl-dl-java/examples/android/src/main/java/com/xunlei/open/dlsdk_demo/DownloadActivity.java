@@ -19,12 +19,7 @@ public class DownloadActivity extends AppCompatActivity implements TaskAdapter.O
     private DownloadViewModel viewModel;
     private TaskAdapter taskAdapter;
     private ActivityDownloadBinding binding;
-    // 添加权限相关常量
-    private static final int PERMISSION_REQUEST_CODE = 1001;
-    private static final String[] REQUIRED_PERMISSIONS = {
-            android.Manifest.permission.READ_EXTERNAL_STORAGE,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +30,6 @@ public class DownloadActivity extends AppCompatActivity implements TaskAdapter.O
 
         initViews();
         observeViewModel();
-        checkPermissions();
     }
 
     private void initViews() {
@@ -133,14 +127,6 @@ public class DownloadActivity extends AppCompatActivity implements TaskAdapter.O
     }
 
     private void showAddTaskDialog() {
-        // 检查权限
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (checkSelfPermission(permission) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "需要存储权限才能下载文件", Toast.LENGTH_SHORT).show();
-                checkPermissions();
-                return;
-            }
-        }
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_task, null);
         EditText urlInput = dialogView.findViewById(R.id.url_input);
 
@@ -181,35 +167,6 @@ public class DownloadActivity extends AppCompatActivity implements TaskAdapter.O
                         viewModel.deleteTask(taskId))
                 .setNegativeButton(R.string.cancel, null)
                 .show();
-    }
-
-    // 添加权限检查方法
-    private void checkPermissions() {
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (checkSelfPermission(permission) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(REQUIRED_PERMISSIONS, PERMISSION_REQUEST_CODE);
-                return;
-            }
-        }
-    }
-
-    // 添加权限请求结果处理
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            boolean allGranted = true;
-            for (int result : grantResults) {
-                if (result != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                    allGranted = false;
-                    break;
-                }
-            }
-
-            if (!allGranted) {
-                Toast.makeText(this, "需要存储权限才能下载文件", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
 }

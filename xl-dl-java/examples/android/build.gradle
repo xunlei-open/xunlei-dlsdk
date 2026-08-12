@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.xunlei.open.examples'
-version = '1.0.2'
+version = '1.0.3'
 
 android {
     namespace 'com.xunlei.open.dlsdk_demo'
@@ -35,7 +35,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.xunlei.open:xl-dl-android:1.0.2'
+    implementation 'com.xunlei.open:xl-dl-android:1.0.3'
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.8.7'
     implementation 'androidx.lifecycle:lifecycle-livedata:2.8.7'

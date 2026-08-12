@@ -18,17 +18,17 @@ XL Download .NET Desktop SDK 适用于在 Windows、macOS 和 Linux 的 .NET 桌
 
 | 目标运行时 | PackageReference |
 | --- | --- |
-| Windows x64 | `<PackageReference Include="Xunlei.Open.DlSdk.Native.win-x64" Version="1.0.2" />` |
-| Windows x86 | `<PackageReference Include="Xunlei.Open.DlSdk.Native.win-x86" Version="1.0.2" />` |
-| macOS Universal | `<PackageReference Include="Xunlei.Open.DlSdk.Native.osx-universal" Version="1.0.2" />` |
-| Linux x64 | `<PackageReference Include="Xunlei.Open.DlSdk.Native.linux-x64" Version="1.0.2" />` |
+| Windows x64 | `<PackageReference Include="Xunlei.Open.DlSdk.Native.win-x64" Version="1.0.3" />` |
+| Windows x86 | `<PackageReference Include="Xunlei.Open.DlSdk.Native.win-x86" Version="1.0.3" />` |
+| macOS Universal | `<PackageReference Include="Xunlei.Open.DlSdk.Native.osx-universal" Version="1.0.3" />` |
+| Linux x64 | `<PackageReference Include="Xunlei.Open.DlSdk.Native.linux-x64" Version="1.0.3" />` |
 
 例如接入 Windows x64：
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Xunlei.Open.DlSdk" Version="1.0.2" />
-  <PackageReference Include="Xunlei.Open.DlSdk.Native.win-x64" Version="1.0.2" />
+  <PackageReference Include="Xunlei.Open.DlSdk" Version="1.0.3" />
+  <PackageReference Include="Xunlei.Open.DlSdk.Native.win-x64" Version="1.0.3" />
 </ItemGroup>
 ```
 

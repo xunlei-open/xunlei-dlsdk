@@ -65,7 +65,7 @@ public class DownloadRepository {
         int result = XLDownloadAPI.init(
                 APP_ID,
                 APP_VERSION,
-                "/tmp/xl_dl_sdk_conf",
+                context.getFilesDir().getAbsolutePath(),
                 true
         );
         if (result != XLDownloadAPI.ERROR_SUCCESS && result != XLDownloadAPI.ERROR_ALREADY_INIT) {
