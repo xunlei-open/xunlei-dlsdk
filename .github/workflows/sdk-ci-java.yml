@@ -136,7 +136,7 @@ jobs:
           cd examples/android
           ./gradlew assembleDebug
 
-java-android-integration:
+  java-android-integration:
     name: Java Android Integration
     runs-on: macos-14
     defaults:
