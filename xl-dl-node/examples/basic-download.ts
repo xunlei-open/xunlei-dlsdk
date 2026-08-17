@@ -5,7 +5,7 @@ import { ERROR_ALREADY_INIT, ERROR_SUCCESS, TASK_STATUS_FAILED, TASK_STATUS_SUCC
 const appId = "eGwtcVo4SDEwMDMwAAAAAy4nxxx="; // TODO: Replace with your own app ID.
 const apiKey = "xl_ba3edc87e2734c8bf177a04f3dd4xxx"; // TODO: Replace with your own API key.
 const appVersion = "1.0";
-const taskUrl = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe";
+const taskUrl = "https://down.sandai.net/thunder11/XunLeiWebSetup25.0.90.1592xl11.exe";
 
 async function main() {
   const configPath = "/tmp/xl_dl_sdk_conf";

@@ -2,7 +2,7 @@ import Foundation
 import XlDlSwift
 
 let appVersion = "1.0"
-let defaultTaskURL = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe"
+let defaultTaskURL = "https://down.sandai.net/thunder11/XunLeiWebSetup25.0.90.1592xl11.exe"
 let errorSuccess: Int32 = 0
 let errorAlreadyInit: Int32 = 9101
 

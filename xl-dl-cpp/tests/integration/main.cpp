@@ -13,7 +13,7 @@
 namespace {
 
 const char* kAppVersion = "1.0";
-const char* kDefaultTaskUrl = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe";
+const char* kDefaultTaskUrl = "https://down.sandai.net/thunder11/XunLeiWebSetup25.0.90.1592xl11.exe";
 
 std::string env_or(const char* name, const char* fallback) {
     const char* value = std::getenv(name);

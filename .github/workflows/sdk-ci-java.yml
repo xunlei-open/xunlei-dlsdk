@@ -16,8 +16,8 @@ on:
   workflow_dispatch:
 
 env:
-  XL_DL_TEST_TIMEOUT_SECONDS: "1500"
-  XL_DL_TEST_URL: "https://speed.cloudflare.com/__down?bytes=3145728"
+  XL_DL_TEST_TIMEOUT_SECONDS: "900"
+  XL_DL_TEST_URL: ${{ vars.XL_DL_TEST_URL }}
 
 jobs:
   java-desktop:

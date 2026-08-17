@@ -14,7 +14,7 @@ const {
 } = require("../dist/index.cjs");
 
 const APP_VERSION = "1.0";
-const DEFAULT_TASK_URL = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe";
+const DEFAULT_TASK_URL = "https://down.sandai.net/thunder11/XunLeiWebSetup25.0.90.1592xl11.exe";
 const DEFAULT_TIMEOUT_SECONDS = 900;
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
