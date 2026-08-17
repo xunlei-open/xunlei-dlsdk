@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
 
 env:
-  XL_DL_TEST_TIMEOUT_SECONDS: "900"
+  XL_DL_TEST_TIMEOUT_SECONDS: "1500"
   XL_DL_TEST_URL: ${{ vars.XL_DL_TEST_URL }}
 
 jobs:
@@ -136,9 +136,9 @@ jobs:
           cd examples/android
           ./gradlew assembleDebug
 
-  java-android-integration:
+java-android-integration:
     name: Java Android Integration
-    runs-on: ubuntu-latest
+    runs-on: macos-14
     defaults:
       run:
         working-directory: xl-dl-java
@@ -152,11 +152,14 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: android-actions/setup-android@v3
-      - name: Install Android NDK
+      - name: Install Android NDK and emulator packages
         shell: bash
         run: |
-          # Emulator system image is installed by android-emulator-runner.
-          sdkmanager --install "ndk;27.0.12077973" "cmake;3.22.1"
+          sdkmanager --install "ndk;27.0.12077973" "cmake;3.22.1" \
+            "system-images;android-30;google_apis;arm64-v8a" \
+            "platforms;android-30" \
+            "emulator" \
+            "platform-tools"
           yes | sdkmanager --licenses >/dev/null || true
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x gradlew
@@ -164,23 +167,14 @@ jobs:
         if: ${{ env.APP_ID != '' && env.API_KEY != '' }}
         shell: bash
         run: ./gradlew :android:assembleDebug :android:assembleDebugAndroidTest
-      - name: Enable KVM
-        if: ${{ env.APP_ID != '' && env.API_KEY != '' }}
-        shell: bash
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
       - name: Run Android integration test
         if: ${{ env.APP_ID != '' && env.API_KEY != '' }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          # Native libs are arm64-only; keep arm64-v8a image even on ubuntu x86 hosts.
           api-level: 30
           arch: arm64-v8a
           target: google_apis
-          force-avd-creation: true
-          disable-animations: true
+          force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: ./gradlew :android:integrationTest
           working-directory: xl-dl-java
