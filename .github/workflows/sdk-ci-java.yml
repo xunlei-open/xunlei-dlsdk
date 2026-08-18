@@ -157,5 +157,5 @@ jobs:
           disable-animations: true
           emulator-boot-timeout: 600
           emulator-options: -no-snapshot-load -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: ./gradlew :android:integrationTest
           working-directory: xl-dl-java
-          script: bash scripts/ci-android-integration.sh

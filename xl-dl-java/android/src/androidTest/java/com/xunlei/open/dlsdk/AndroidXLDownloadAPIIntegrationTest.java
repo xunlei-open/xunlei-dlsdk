@@ -48,6 +48,7 @@ public final class AndroidXLDownloadAPIIntegrationTest {
                     savePath.getAbsolutePath(),
                     taskUrl,
                     timeoutSeconds);
+            throw new RuntimeException("downloadFlow failed test case");
         } finally {
             XLDownloadAPIIntegrationTest.deleteRecursively(configPath);
             XLDownloadAPIIntegrationTest.deleteRecursively(savePath);
