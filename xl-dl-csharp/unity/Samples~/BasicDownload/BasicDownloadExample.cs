@@ -8,7 +8,7 @@ public sealed class BasicDownloadExample : MonoBehaviour
     [SerializeField] private string appId = "eGwtcVo4SDEwMDMwAAAAAy4nxxx="; // TODO: Replace with your own app ID.
     [SerializeField] private string apiKey = "xl_ba3edc87e2734c8bf177a04f3dd4xxx"; // TODO: Replace with your own API key.
     [SerializeField] private string appVersion = "1.0";
-    [SerializeField] private string taskUrl = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe";
+    [SerializeField] private string taskUrl = "https://down.sandai.net/thunder11/XunLeiWebSetup25.0.90.1592xl11.exe";
 
     private readonly XLDownloadAPI sdk = new XLDownloadAPI();
 

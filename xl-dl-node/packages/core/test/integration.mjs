@@ -14,7 +14,7 @@ const {
 } = require("../dist/index.cjs");
 
 const APP_VERSION = "1.0";
-const DEFAULT_TASK_URL = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe";
+const DEFAULT_TASK_URL = "https://down.sandai.net/thunder11/XunLeiWebSetup25.0.90.1592xl11.exe";
 const DEFAULT_TIMEOUT_SECONDS = 900;
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -24,7 +24,7 @@ async function downloadTest(sdk, taskUrl, savePath, timeoutSeconds) {
   const create = sdk.createP2spTask({ url: taskUrl, savePath, saveName });
   assert.equal(create.result, ERROR_SUCCESS, `create task failed: ${create.result}`);
   assert.ok(create.taskId > 0n, "task id must be greater than zero");
-  taskId = create.taskId;
+  const taskId = create.taskId;
 
   const startResult = sdk.startTask(taskId);
   assert.equal(startResult, ERROR_SUCCESS, `start task failed: ${startResult}`);
@@ -34,7 +34,7 @@ async function downloadTest(sdk, taskUrl, savePath, timeoutSeconds) {
     const state = sdk.getTaskState(taskId);
     assert.equal(state.result, ERROR_SUCCESS, `get task state failed: ${state.result}`);
     if (state.state.stateCode === TASK_STATUS_SUCCEEDED) {
-      return;
+      return taskId;
     }
     assert.notEqual(state.state.stateCode, TASK_STATUS_FAILED, "task failed");
     await sleep(1000);
@@ -86,11 +86,11 @@ async function main() {
     }
 
 
-    await downloadTest(sdk, taskUrl, savePath, timeoutSeconds);
+    taskId = await downloadTest(sdk, taskUrl, savePath, timeoutSeconds);
 
     const setAccelerationResult = sdk.setDynamicLinkAcceleration(false);
     assert.equal(setAccelerationResult, ERROR_SUCCESS, `set dynamic link acceleration failed: ${setAccelerationResult}`);
-    await downloadTest(sdk, taskUrl, savePath, timeoutSeconds);
+    taskId = await downloadTest(sdk, taskUrl, savePath, timeoutSeconds);
   } finally {
     try {
       if (taskId !== 0n && sdk) {

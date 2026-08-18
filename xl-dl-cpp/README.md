@@ -15,10 +15,10 @@ XL Download C++ SDK 适用于在 Windows、macOS 和 Linux 桌面应用中接入
 
 ## 安装
 
-下载 [xunlei-dlsdk-cpp-1.0.2.zip](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-cpp-1.0.2.zip)，解压后安装到本地目录：
+下载 [xunlei-dlsdk-cpp-1.0.3.zip](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-cpp-1.0.3.zip)，解压后安装到本地目录：
 
 ```bash
-unzip xunlei-dlsdk-cpp-1.0.2.zip
+unzip xunlei-dlsdk-cpp-1.0.3.zip
 cmake -S xunlei-dlsdk-cpp -B build-sdk \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=/tmp/xunlei-dlsdk-cpp

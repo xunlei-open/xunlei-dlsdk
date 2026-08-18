@@ -1,7 +1,7 @@
 using Xunlei.XlDl;
 
 const string AppVersion = "1.0";
-const string DefaultTaskUrl = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe";
+const string DefaultTaskUrl = "https://down.sandai.net/thunder11/XunLeiWebSetup25.0.90.1592xl11.exe";
 
 string apiKey = Environment.GetEnvironmentVariable("API_KEY") ?? string.Empty;
 Require(!string.IsNullOrEmpty(apiKey), "API_KEY environment variable is required");

@@ -14,10 +14,10 @@ XL Download Java Android SDK 适用于在 Android arm64-v8a 应用中接入迅�
 
 ## 安装
 
-下载 [`xunlei-dlsdk-java-android-1.0.2.aar`](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-java-android-1.0.2.aar)，放入应用工程的 `libs/` 目录后引入：
+下载 [`xunlei-dlsdk-java-android-1.0.3.aar`](https://github.com/xunlei-open/xunlei-dlsdk/releases/latest/download/xunlei-dlsdk-java-android-1.0.3.aar)，放入应用工程的 `libs/` 目录后引入：
 
 ```gradle
-implementation(files("libs/xunlei-dlsdk-java-android-1.0.2.aar"))
+implementation(files("libs/xunlei-dlsdk-java-android-1.0.3.aar"))
 ```
 
 Java API 入口：
@@ -102,6 +102,21 @@ public final class DownloadSdk {
         }
     }
 }
+```
+
+## 本地构建与集成测试
+
+```bash
+cd xl-dl-java
+./gradlew :android:assembleRelease :android:publishToMavenLocal
+```
+
+在已连接的 arm64-v8a 设备或模拟器上跑集成测试（需 `APP_ID` / `API_KEY`）：
+
+```bash
+export APP_ID=...
+export API_KEY=...
+./gradlew :android:integrationTest
 ```
 
 ## 示例项目

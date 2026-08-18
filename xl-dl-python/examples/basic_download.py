@@ -9,7 +9,7 @@ from xl_dl import ERROR_ALREADY_INIT, ERROR_SUCCESS, TASK_STATUS_FAILED, TASK_ST
 APP_ID = "eGwtcVo4SDEwMDMwAAAAAy4nxxx="  # TODO: Replace with your own app ID.
 API_KEY = "xl_ba3edc87e2734c8bf177a04f3dd4xxx"  # TODO: Replace with your own API key.
 APP_VERSION = "1.0"
-TASK_URL = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe"
+TASK_URL = "https://down.sandai.net/thunder11/XunLeiWebSetup25.0.90.1592xl11.exe"
 
 
 def main() -> int:

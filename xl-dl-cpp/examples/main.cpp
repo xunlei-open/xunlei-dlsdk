@@ -30,7 +30,7 @@ bool ensure_dir(const char* path) {
 
 int main() {
     const std::string api_key = "xl_ba3edc87e2734c8bf177a04f3dd4xxx";  // TODO: Replace with your own API key.
-    const std::string task_url = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe";
+    const std::string task_url = "https://down.sandai.net/thunder11/XunLeiWebSetup25.0.90.1592xl11.exe";
     const std::string save_name = "XunLeiSetup12.0.12.2510.exe";
 
     char version[128] = {0};

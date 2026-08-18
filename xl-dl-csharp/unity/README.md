@@ -25,8 +25,8 @@ using Xunlei.XlDl.Unity;
 ```json
 {
   "dependencies": {
-    "com.xunlei.open.dlsdk": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity#v1.0.2",
-    "com.xunlei.open.dlsdk.native.windows-x64": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.windows-x64#v1.0.2"
+    "com.xunlei.open.dlsdk": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity#v1.0.3",
+    "com.xunlei.open.dlsdk.native.windows-x64": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.windows-x64#v1.0.3"
   }
 }
 ```
@@ -35,10 +35,10 @@ using Xunlei.XlDl.Unity;
 
 | 目标平台 | manifest 依赖项 |
 | --- | --- |
-| Windows x64 | `"com.xunlei.open.dlsdk.native.windows-x64": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.windows-x64#v1.0.2"` |
-| macOS Universal | `"com.xunlei.open.dlsdk.native.macos-universal": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.macos-universal#v1.0.2"` |
-| Android arm64-v8a | `"com.xunlei.open.dlsdk.native.android": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.android#v1.0.2"` |
-| iOS | `"com.xunlei.open.dlsdk.native.ios": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.ios#v1.0.2"` |
+| Windows x64 | `"com.xunlei.open.dlsdk.native.windows-x64": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.windows-x64#v1.0.3"` |
+| macOS Universal | `"com.xunlei.open.dlsdk.native.macos-universal": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.macos-universal#v1.0.3"` |
+| Android arm64-v8a | `"com.xunlei.open.dlsdk.native.android": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.android#v1.0.3"` |
+| iOS | `"com.xunlei.open.dlsdk.native.ios": "https://github.com/xunlei-open/xunlei-dlsdk.git?path=/xl-dl-csharp/unity/native/com.xunlei.open.dlsdk.native.ios#v1.0.3"` |
 
 ## 使用
 

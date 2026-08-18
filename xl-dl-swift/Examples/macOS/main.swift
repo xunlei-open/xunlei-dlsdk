@@ -4,7 +4,7 @@ import XlDlSwift
 let appId = "eGwtcVo4SDEwMDMwAAAAAy4nxxx=" // TODO: Replace with your own app ID.
 let apiKey = "xl_ba3edc87e2734c8bf177a04f3dd4xxx" // TODO: Replace with your own API key.
 let appVersion = "1.0"
-let taskURL = URL(string: "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe")!
+let taskURL = URL(string: "https://down.sandai.net/thunder11/XunLeiWebSetup25.0.90.1592xl11.exe")!
 
 let configPath = "/tmp/xl_dl_sdk_conf"
 let savePath = "/tmp/ThunderDownload"

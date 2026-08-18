@@ -12,11 +12,12 @@ final class NativeLoader {
         }
         try {
             System.loadLibrary("dk");
+            System.loadLibrary("jni_dk");
             loaded = true;
         } catch (UnsatisfiedLinkError error) {
             UnsatisfiedLinkError wrapped = new UnsatisfiedLinkError(
-                    "Failed to load Android native library libdk.so from xl-dl-android. "
-                            + "Check that the AAR contains jni/arm64-v8a/libdk.so. Cause: "
+                    "Failed to load Android native libraries libdk.so / libjni_dk.so from xl-dl-android. "
+                            + "Check that the AAR contains jni/arm64-v8a/libdk.so and libjni_dk.so. Cause: "
                             + error.getMessage());
             wrapped.initCause(error);
             throw wrapped;

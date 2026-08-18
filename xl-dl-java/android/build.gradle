@@ -3,14 +3,36 @@ plugins {
     id 'maven-publish'
 }
 
+def commonNativeDir = file('../common/src/main/native')
+def androidDkDir = file('src/main/jniLibs/arm64-v8a')
+
 android {
     namespace 'com.xunlei.open.dlsdk'
     compileSdk 35
+    ndkVersion '27.0.12077973'
 
     defaultConfig {
         minSdk 23
         aarMetadata {
             minCompileSdk = 23
+        }
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        // Host env vars are not visible to System.getenv() inside the on-device test process.
+        // Pass them through instrumentation arguments so CI/local secrets reach the emulator.
+        testInstrumentationRunnerArguments = [
+                APP_ID                    : System.getenv('APP_ID') ?: '',
+                API_KEY                   : System.getenv('API_KEY') ?: '',
+                XL_DL_TEST_URL            : System.getenv('XL_DL_TEST_URL') ?: '',
+                XL_DL_TEST_TIMEOUT_SECONDS: System.getenv('XL_DL_TEST_TIMEOUT_SECONDS') ?: ''
+        ]
+        externalNativeBuild {
+            cmake {
+                arguments "-DXL_DL_NATIVE_DIR=${androidDkDir.absolutePath}",
+                        "-DXL_DL_COMMON_NATIVE_DIR=${commonNativeDir.absolutePath}"
+            }
         }
     }
 
@@ -21,11 +43,36 @@ android {
             java.srcDirs = ['../common/src/main/java', 'src/main/java']
             jniLibs.srcDirs = ['src/main/jniLibs']
         }
+        androidTest {
+            java.srcDirs += ['../common/src/test/java', 'src/androidTest/java']
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     publishing {
         singleVariant('release')
     }
+}
+
+dependencies {
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+}
+
+tasks.register('integrationTest') {
+    group = 'verification'
+    description = 'Runs the Android SDK integration flow on a connected arm64-v8a device or emulator.'
+    dependsOn 'connectedDebugAndroidTest'
 }
 
 afterEvaluate {

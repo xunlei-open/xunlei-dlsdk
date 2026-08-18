@@ -3,7 +3,7 @@ using Xunlei.XlDl;
 const string AppId = "eGwtcVo4SDEwMDMwAAAAAy4nxxx="; // TODO: Replace with your own app ID.
 const string ApiKey = "xl_ba3edc87e2734c8bf177a04f3dd4xxx"; // TODO: Replace with your own API key.
 const string AppVersion = "1.0";
-const string TaskUrl = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe";
+const string TaskUrl = "https://down.sandai.net/thunder11/XunLeiWebSetup25.0.90.1592xl11.exe";
 
 const string configPath = "/tmp/xl_dl_sdk_conf";
 const string savePath = "/tmp/ThunderDownload";

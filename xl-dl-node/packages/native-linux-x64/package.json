@@ -1,6 +1,6 @@
 {
   "name": "@xunlei-open/dlsdk-native-linux-x64",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "XL Download Node SDK 的 Linux x64 平台动态库包。",
   "main": "index.js",
   "files": [

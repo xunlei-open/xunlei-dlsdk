@@ -48,13 +48,13 @@ sourceSets {
 
 tasks.register('configureJniBridge', Exec) {
     onlyIf { canBuildJniBridge() }
-    inputs.dir rootProject.file('desktop/src/main/native')
+    inputs.dir rootProject.file('common/src/main/native')
     inputs.file new File(nativeLinkInputDir, isWindows ? 'dk.lib' : coreLibraryName)
     outputs.dir cmakeBuildDir
 
     def cmakeArgs = [
             'cmake',
-            '-S', rootProject.file('desktop/src/main/native').absolutePath,
+            '-S', rootProject.file('common/src/main/native').absolutePath,
             '-B', cmakeBuildDir.get().asFile.absolutePath,
             '-DCMAKE_BUILD_TYPE=Release',
             "-DXL_DL_NATIVE_DIR=${nativeLinkInputDir.absolutePath}"

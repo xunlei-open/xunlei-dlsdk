@@ -10,7 +10,8 @@ sourceSets {
         java.srcDirs = ['../common/src/main/java', 'src/main/java']
     }
     test {
-        java.srcDirs = ['src/test/java']
+        // Shared integration flow lives in common; keep only platform-specific tests here.
+        java.srcDirs = ['../common/src/test/java', 'src/test/java']
     }
 }
 

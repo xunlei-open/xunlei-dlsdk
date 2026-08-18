@@ -17,7 +17,7 @@ from xl_dl import (
 
 
 APP_VERSION = "1.0"
-DEFAULT_TASK_URL = "https://down.sandai.net/thunder11/XunLeiSetup12.0.12.2510.exe"
+DEFAULT_TASK_URL = "https://down.sandai.net/thunder11/XunLeiWebSetup25.0.90.1592xl11.exe"
 DEFAULT_TIMEOUT_SECONDS = 900
 
 
